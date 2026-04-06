@@ -17,9 +17,20 @@ import 'package:flutter_application_appnexts/registration_1.dart';
 import 'package:flutter_application_appnexts/resturant_menu.dart';
 import 'package:flutter_application_appnexts/setting.dart';
 
+<<<<<<< HEAD
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+=======
+import 'firebase_options.dart';
+
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+>>>>>>> 2afc647 (Initial commit)
   runApp(const MyApp());
 }
 

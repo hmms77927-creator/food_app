@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:flutter/material.dart';
 // import 'package:flutter_application_appnexts/dra_home.dart';
@@ -723,6 +724,8 @@
 //   }
 // }
 
+=======
+>>>>>>> 2afc647 (Initial commit)
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_appnexts/dra_home.dart';
@@ -731,6 +734,8 @@ import 'package:flutter_application_appnexts/location_1.dart';
 import 'package:flutter_application_appnexts/resturant_menu.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get/get_navigation/src/extension_navigation.dart';
+
+import 'Models/model_users.dart';
 
 class HomeV1 extends StatefulWidget {
   const HomeV1({super.key});
@@ -933,11 +938,16 @@ class _HomeV1State extends State<HomeV1> {
               color: Colors.white,
               child: Padding(
                 padding: EdgeInsets.all(8),
+<<<<<<< HEAD
                 child: SizedBox(
+=======
+                child:SizedBox(
+>>>>>>> 2afc647 (Initial commit)
                   height: 70,
                   child: ListView(
                     scrollDirection: Axis.horizontal,
                     children: [
+<<<<<<< HEAD
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -1062,6 +1072,132 @@ class _HomeV1State extends State<HomeV1> {
                         ],
                       ),
                     ],
+=======
+                   Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Color(0xFFEB4646),
+                            borderRadius: BorderRadius.circular(39),
+                            boxShadow: [
+                              BoxShadow(
+                                blurRadius: 30,
+                                spreadRadius: 0,
+                                color: Color(0xFFEFE6E1),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CircleAvatar(
+                                radius: 23,
+                                backgroundImage: AssetImage(
+                                  'assats/image/34f428e47c8da57a9f796e1596d68f1688fa073a.png',
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Text(
+                                'All',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(39),
+                              boxShadow: [
+                                BoxShadow(
+                                  spreadRadius: 0,
+                                  blurRadius: 12,
+                                  color: Colors.black.withOpacity(0.15),
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircleAvatar(
+                                  radius: 23,
+                                  backgroundImage: AssetImage(
+                                    'assats/image/30fc202b681cf552fb8011ec1be440edbee3f301.png',
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Hot Dog',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(39),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.15),
+                                  spreadRadius: 0,
+                                  blurRadius: 12,
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                CircleAvatar(
+                                  radius: 23,
+                                  backgroundImage: AssetImage(
+                                    'assats/image/cbd8173438dd01c6f5e642f129e262e385c4d0cc.png',
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Burger',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    ]
+>>>>>>> 2afc647 (Initial commit)
                   ),
                 ),
               ),
@@ -1082,6 +1218,7 @@ class _HomeV1State extends State<HomeV1> {
                 ),
               ),
             ),
+<<<<<<< HEAD
             StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('add_restaurant')
@@ -1371,7 +1508,270 @@ class _HomeV1State extends State<HomeV1> {
                       },
                     );
                   },
+=======
+            Column(
+              children: [
+                StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance.collection('add_restaurant').snapshots(),
+                    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) { // <-- correct
+                      if (!snapshot.hasData) {
+                        return Center(child: CircularProgressIndicator());
+                      }
+                      final docs = snapshot.data!.docs;
+                      return ListView.builder(
+                    itemCount: docs.length,
+                    shrinkWrap: true,
+                    itemBuilder: (Builder ,index)
+                  {
+                    final data = docs[index].data() as Map<String, dynamic>;
+                    final String name = data['name']; // get the 'name' field
+                    final String description = data['description']; // get description
+                    final String opening = data['opening']; // opening time
+                    final String closing = data['closing'];
+                    final String imageUrl = data['imageurl'] ?? ''; // Firestore me jo URL store hua
+                    return
+                      Card(
+                      color: Colors.white,
+                      child: Column(
+                        children: [
+                          Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 4.0,
+                      right: 4,
+                      top: 4,
+                      bottom: 1,
+                    ),
+                    child: Container(
+                      width: 93,
+                      height: 69,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.transparent,
+                          width: 1,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        image: DecorationImage(
+                          image: imageUrl != ''
+                              ? NetworkImage(imageUrl) // Firestore URL se image
+                              : AssetImage('assats/image/ecaa5c0d4bd618634326e8c00080ab106a4c9206.png') as ImageProvider,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Column(
+                    children: [
+                      Container(
+                        child: Text(
+                  '$name',
+                          style: TextStyle(
+                            color: Color(0xFF181C2E),
+                            fontSize: 22,
+                            fontWeight: .w400,
+                          ),
+                        ),
+                      ),
+                      Container(
+                        child: Text(
+                          '$description ',
+                          style: TextStyle(
+                            color: Color(0xFFA0A5BA),
+                            fontSize: 18,
+                            fontWeight: .w400,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                          ),
+                          Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: Container(
+                      child: Text(
+                        'Open :',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: .w700,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    child: Text(
+                      ' $opening  ',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: .w700,
+                        color: Colors.green,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 15.0),
+                    child: Container(
+                      child: Text(
+                        'Close : ',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: .w700,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                    child: Text(
+                      '$closing  ',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: .w700,
+                        color: Colors.green,
+                      ),
+                    ),
+                  ),
+                  Spacer(),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Favorate(),
+                        ),
+                      );
+                    },
+                    icon: Icon(
+                      Icons.favorite_border,
+                      color: Color(0xFFEB4646),
+                    ),
+                  ),
+                ],
+                          ),
+                          Row(
+                children: [
+                  IconButton(
+                    onPressed: () {},
+                    icon: Icon(
+                      Icons.star_border,
+                      color: Color(0xFFEB4646),
+                    ),
+                  ),
+                  Container(
+                    child: Text(
+                      '4.7',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: .w700,
+                      ),
+                    ),
+                  ),
+                ],
+                          ),
+                          Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 15.0,
+                      top: 0,
+                    ),
+                    child: SizedBox(
+                      width: 116,
+                      height: 35,
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius:
+                            BorderRadiusGeometry.circular(10),
+                            side: BorderSide(
+                              color: Color(0xFFEB4646),
+                            ),
+                          ),
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ResturantMenu(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          'Moderate',
+                          style: TextStyle(
+                            color: Color(0xFFEB4646),
+                            fontSize: 14,
+                            fontWeight: .w700,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      left: 10.0,
+                      top: 2,
+                    ),
+                    child: TextButton.icon(
+                      style: TextButton.styleFrom(
+                        backgroundColor: Color(0xFFEB4646),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadiusGeometry.circular(
+                            10,
+                          ),
+                          side: BorderSide(color: Color(0xFFEB4646)),
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ResturantMenu(),
+                          ),
+                        );
+                      },
+                      label: Text(
+                        'view mensu',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      icon: Icon(
+                        Icons.menu_book,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 10.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => Location1(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        child: Image.asset('assats/image/Vector.png'),
+                      ),
+                    ),
+                  ),
+                ],
+                          ),
+                        ],
+                      ),
+                    );
+                  });
+                }),
+              ],
+>>>>>>> 2afc647 (Initial commit)
             ),
+
           ],
         ),
       ),

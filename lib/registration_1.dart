@@ -118,7 +118,6 @@ class _Registration1State extends State<Registration1> {
               ),
             ),
           ),
-
           Positioned(
             top: 670,
             bottom: 30,

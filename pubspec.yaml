@@ -43,6 +43,12 @@ dependencies:
   cloud_firestore: ^6.2.0
   get: ^4.7.3
   image_picker: ^1.2.1
+<<<<<<< HEAD
+=======
+  http: ^1.6.0
+  cloudinary: ^1.2.0
+ 
+>>>>>>> 2afc647 (Initial commit)
 
 
 
