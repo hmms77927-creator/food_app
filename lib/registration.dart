@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_appnexts/home_V1.dart';
 
@@ -13,6 +15,39 @@ class _RegistrationState extends State<Registration> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   bool isSave = false;
+  Future<void> login(BuildContext context) async {
+    try {
+      final userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+          );
+      await FirebaseFirestore.instance.collection('user').add({
+        'name': nameController.text,
+        'email': emailController.text,
+      });
+      print("Login Success: ${userCredential.user!.email}");
+    } catch (e) {
+      print("Login Error: $e");
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Login Failed")));
+    }
+  }
+
+  Future<void> signup() async {
+    try {
+      final userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: emailController.text.trim(),
+            password: passwordController.text.trim(),
+          );
+
+      print("User Created: ${userCredential.user!.email}");
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -170,7 +205,8 @@ class _RegistrationState extends State<Registration> {
                                             ),
                                           ),
                                         ),
-                                        onPressed: () {
+                                        onPressed: () async {
+                                          await signup();
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
@@ -300,7 +336,8 @@ class _RegistrationState extends State<Registration> {
                                                   BorderRadius.circular(12),
                                             ),
                                           ),
-                                          onPressed: () {
+                                          onPressed: () async {
+                                            await login(context);
                                             Navigator.push(
                                               context,
                                               MaterialPageRoute(

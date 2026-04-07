@@ -38,7 +38,11 @@ dependencies:
   dotted_decoration: ^2.0.0
   flutter_rating_bar: ^4.0.1
   dots_indicator: ^4.0.1
- 
+  firebase_core: ^4.6.0
+  firebase_auth: ^6.3.0
+  cloud_firestore: ^6.2.0
+  get: ^4.7.3
+  image_picker: ^1.2.1
 
 
 

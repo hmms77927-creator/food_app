@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_appnexts/imge.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -10,6 +12,8 @@ class Rating1 extends StatefulWidget {
 }
 
 class _Rating1State extends State<Rating1> {
+  double userRating = 0.0;
+  TextEditingController reviewcontroller = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -360,91 +364,124 @@ class _Rating1State extends State<Rating1> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(15.0),
-              child: Card(
-                color: Colors.white,
-                child: Column(
-                  mainAxisAlignment: .start,
-                  crossAxisAlignment: .start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: Container(
-                        child: Text(
-                          'Main',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 22,
-                            fontWeight: .w700,
-                          ),
-                        ),
+            // Padding(
+            //   padding: const EdgeInsets.all(15.0),
+            //   child: Card(
+            //     color: Colors.white,
+            //     child: Column(
+            //       mainAxisAlignment: .start,
+            //       crossAxisAlignment: .start,
+            //       children: [
+            //         Padding(
+            //           padding: const EdgeInsets.only(left: 8.0),
+            //           child: Container(
+            //             child: Text(
+            //               'Main',
+            //               style: TextStyle(
+            //                 color: Colors.black,
+            //                 fontSize: 22,
+            //                 fontWeight: .w700,
+            //               ),
+            //             ),
+            //           ),
+            //         ),
+            //         Padding(
+            //           padding: const EdgeInsets.all(8.0),
+            //           child: Row(
+            //             children: [
+            //               RatingBar.builder(
+            //                 initialRating: 4.5,
+            //                 minRating: 1,
+            //                 allowHalfRating: true,
+            //                 direction: Axis.horizontal,
+            //                 itemCount: 5,
+            //                 itemSize: 20,
+            //                 itemBuilder: (context, _) =>
+            //                     Icon(Icons.star, color: Colors.amber),
+            //                 onRatingUpdate: (rating) {
+            //                   print(rating);
+            //                 },
+            //               ),
+            //               Container(
+            //                 child: Text(
+            //                   'Yesterday',
+            //                   style: TextStyle(
+            //                     color: Colors.grey,
+            //                     fontSize: 18,
+            //                     fontWeight: .w500,
+            //                   ),
+            //                 ),
+            //               ),
+            //             ],
+            //           ),
+            //         ),
+            //         Padding(
+            //           padding: const EdgeInsets.only(left: 8.0),
+            //           child: Container(
+            //             child: Text(
+            //               'there are no burgers in any of deal',
+            //               style: TextStyle(
+            //                 color: Colors.black,
+            //                 fontSize: 18,
+            //                 fontWeight: .w500,
+            //               ),
+            //             ),
+            //           ),
+            //         ),
+            //         Row(
+            //           children: [
+            //             IconButton(
+            //               onPressed: () {},
+            //               icon: Icon(Icons.thumb_up),
+            //             ),
+            //             Container(
+            //               child: Text(
+            //                 'helpful',
+            //                 style: TextStyle(
+            //                   color: Colors.black,
+            //                   fontSize: 18,
+            //                   fontWeight: .w600,
+            //                 ),
+            //               ),
+            //             ),
+            //           ],
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
+            StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('reviews')
+                  .orderBy('createdAt', descending: true)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: CircularProgressIndicator());
+                }
+
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return Text("No Reviews Yet");
+                }
+
+                final docs = snapshot.data!.docs;
+
+                return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: docs.length,
+                  itemBuilder: (context, index) {
+                    final rating = docs[index]['rating'];
+                    final review = docs[index]['review'];
+
+                    return Card(
+                      child: ListTile(
+                        title: Text("Rating: $rating ⭐"),
+                        subtitle: Text(review),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Row(
-                        children: [
-                          RatingBar.builder(
-                            initialRating: 4.5,
-                            minRating: 1,
-                            allowHalfRating: true,
-                            direction: Axis.horizontal,
-                            itemCount: 5,
-                            itemSize: 20,
-                            itemBuilder: (context, _) =>
-                                Icon(Icons.star, color: Colors.amber),
-                            onRatingUpdate: (rating) {
-                              print(rating);
-                            },
-                          ),
-                          Container(
-                            child: Text(
-                              'Yesterday',
-                              style: TextStyle(
-                                color: Colors.grey,
-                                fontSize: 18,
-                                fontWeight: .w500,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: Container(
-                        child: Text(
-                          'there are no burgers in any of deal',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 18,
-                            fontWeight: .w500,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(Icons.thumb_up),
-                        ),
-                        Container(
-                          child: Text(
-                            'helpful',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 18,
-                              fontWeight: .w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
+                    );
+                  },
+                );
+              },
             ),
             Container(
               child: Text(
@@ -466,6 +503,7 @@ class _Rating1State extends State<Rating1> {
               itemBuilder: (context, _) =>
                   Icon(Icons.star_border, color: Color(0xFFEB4646)),
               onRatingUpdate: (rating) {
+                userRating = rating;
                 print(rating);
               },
             ),
@@ -483,6 +521,7 @@ class _Rating1State extends State<Rating1> {
               height: 76,
               width: 327,
               child: TextField(
+                controller: reviewcontroller,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -506,6 +545,11 @@ class _Rating1State extends State<Rating1> {
               width: 250,
               child: GestureDetector(
                 onTap: () {
+                  FirebaseFirestore.instance.collection('reviews').add({
+                    'rating': userRating,
+                    'review': reviewcontroller.text,
+                  });
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => Imge()),

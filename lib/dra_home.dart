@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_appnexts/notes.dart';
 import 'package:flutter_application_appnexts/rating_1.dart';
@@ -12,6 +14,8 @@ class DraHome extends StatefulWidget {
 }
 
 class _DraHomeState extends State<DraHome> {
+  final uid = FirebaseAuth.instance.currentUser!.uid;
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -51,26 +55,91 @@ class _DraHomeState extends State<DraHome> {
                   ),
                 ),
               ),
-              Container(
-                child: Text(
-                  'Justice Life',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 18,
-                    fontWeight: .w600,
-                  ),
-                ),
+
+              // StreamBuilder<QuerySnapshot>(
+              //   stream: FirebaseFirestore.instance
+              //       .collection('user')
+              //       .snapshots(),
+              //   builder:
+              //       (
+              //         BuildContext context,
+              //         AsyncSnapshot<QuerySnapshot> snapshot,
+              //       ) {
+              //         if (!snapshot.hasData) {
+              //           return Center(child: CircularProgressIndicator());
+              //         }
+              //         final data = snapshot.data!;
+              //         final name = data['name'];
+              //         final email = data['email'];
+              //         return Column(
+              //           children: [
+              //             Text(
+              //               '$name',
+              //               style: TextStyle(
+              //                 color: Colors.black,
+              //                 fontSize: 18,
+              //                 fontWeight: .w600,
+              //               ),
+              //             ),
+              //             Text(
+              //               '$email',
+              //               style: TextStyle(
+              //                 color: Color(0xFF6B7280),
+              //                 fontSize: 18,
+              //                 fontWeight: .w600,
+              //               ),
+              //             ),
+              //           ],
+              //         );
+              //       },
+              // ),
+              StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('user')
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return Center(child: Text("No Data"));
+                  }
+
+                  final docs = snapshot.data!.docs;
+
+                  return ListView.builder(
+                    itemCount: docs.length,
+                    itemBuilder: (context, index) {
+                      final name = docs[index]['name'];
+                      final email = docs[index]['email'];
+
+                      return ListTile(title: Text(name), subtitle: Text(email));
+                    },
+                  );
+                },
               ),
-              Container(
-                child: Text(
-                  'justice@justice.life',
-                  style: TextStyle(
-                    color: Color(0xFF6B7280),
-                    fontSize: 18,
-                    fontWeight: .w600,
-                  ),
-                ),
-              ),
+
+              // Container(
+              //   child: Text(
+              //     'Justice Life',
+              //     style: TextStyle(
+              //       color: Colors.black,
+              //       fontSize: 18,
+              //       fontWeight: .w600,
+              //     ),
+              //   ),
+              // ),
+              // Container(
+              //   child: Text(
+              //     'justice@justice.life',
+              //     style: TextStyle(
+              //       color: Color(0xFF6B7280),
+              //       fontSize: 18,
+              //       fontWeight: .w600,
+              //     ),
+              //   ),
+              // ),
               GestureDetector(
                 onTap: () {
                   MaterialPageRoute(builder: (context) => Setting());

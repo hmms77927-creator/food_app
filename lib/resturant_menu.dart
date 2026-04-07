@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_appnexts/location_1.dart';
 import 'package:flutter_application_appnexts/rating_1.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 
 class ResturantMenu extends StatefulWidget {
   const ResturantMenu({super.key});
@@ -10,6 +12,12 @@ class ResturantMenu extends StatefulWidget {
 }
 
 class _ResturantMenuState extends State<ResturantMenu> {
+  final data = Get.arguments;
+
+  final String name = data['name'];
+  final String description = data['description'];
+  final String opening = data['opening'];
+  final String closing = data['closing'];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,9 +87,19 @@ class _ResturantMenuState extends State<ResturantMenu> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 30.0),
+                  // child: Container(
+                  //   child: Text(
+                  //     'Le Courno’s Restorentie',
+                  //     style: TextStyle(
+                  //       color: Color(0xFF181C2E),
+                  //       fontSize: 24,
+                  //       fontWeight: .w700,
+                  //     ),
+                  //   ),
+                  // ),
                   child: Container(
                     child: Text(
-                      'Le Courno’s Restorentie',
+                      '$name',
                       style: TextStyle(
                         color: Color(0xFF181C2E),
                         fontSize: 24,
@@ -90,11 +108,24 @@ class _ResturantMenuState extends State<ResturantMenu> {
                     ),
                   ),
                 ),
+                // Padding(
+                //   padding: const EdgeInsets.only(left: 30.0),
+                //   child: Container(
+                //     child: Text(
+                //       'Burger - Chicken - Riche - Wings ',
+                //       style: TextStyle(
+                //         color: Color(0xFF181C2E),
+                //         fontSize: 20,
+                //         fontWeight: .w400,
+                //       ),
+                //     ),
+                //   ),
+                // ),
                 Padding(
                   padding: const EdgeInsets.only(left: 30.0),
                   child: Container(
                     child: Text(
-                      'Burger - Chicken - Riche - Wings ',
+                      '$description ',
                       style: TextStyle(
                         color: Color(0xFF181C2E),
                         fontSize: 20,
@@ -162,9 +193,19 @@ class _ResturantMenuState extends State<ResturantMenu> {
               padding: const EdgeInsets.only(left: 30.0),
               child: Row(
                 children: [
+                  // Container(
+                  //   child: Text(
+                  //     'Open : ',
+                  //     style: TextStyle(
+                  //       fontSize: 14,
+                  //       fontWeight: .w700,
+                  //       color: Colors.black,
+                  //     ),
+                  //   ),
+                  // ),
                   Container(
                     child: Text(
-                      'Open : ',
+                      'Open :$opening ',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: .w700,
@@ -172,16 +213,16 @@ class _ResturantMenuState extends State<ResturantMenu> {
                       ),
                     ),
                   ),
-                  Container(
-                    child: Text(
-                      '12:00 PM   ',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: .w700,
-                        color: Colors.green,
-                      ),
-                    ),
-                  ),
+                  // Container(
+                  //   child: Text(
+                  //     '12:00 PM   ',
+                  //     style: TextStyle(
+                  //       fontSize: 14,
+                  //       fontWeight: .w700,
+                  //       color: Colors.green,
+                  //     ),
+                  //   ),
+                  // ),
                   Container(
                     child: Text(
                       '5000+ ratings',
@@ -196,11 +237,24 @@ class _ResturantMenuState extends State<ResturantMenu> {
               ),
             ),
 
+            // Padding(
+            //   padding: const EdgeInsets.only(left: 30.0),
+            //   child: Container(
+            //     child: Text(
+            //       'Description',
+            //       style: TextStyle(
+            //         color: Colors.black,
+            //         fontSize: 22,
+            //         fontWeight: .w700,
+            //       ),
+            //     ),
+            //   ),
+            // ),
             Padding(
               padding: const EdgeInsets.only(left: 30.0),
               child: Container(
                 child: Text(
-                  'Description',
+                  '$description',
                   style: TextStyle(
                     color: Colors.black,
                     fontSize: 22,
@@ -209,58 +263,58 @@ class _ResturantMenuState extends State<ResturantMenu> {
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30.0),
-              child: Container(
-                child: Text(
-                  'it is the restaurant which has  amazing',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                    fontWeight: .w400,
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30.0),
-              child: Container(
-                child: Text(
-                  'menu Burger - steak , pizza , wrap, ',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                    fontWeight: .w400,
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30.0),
-              child: Container(
-                child: Text(
-                  'drinks , hot bar , salad bar and many  ',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                    fontWeight: .w400,
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30.0),
-              child: Container(
-                child: Text(
-                  'taste',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16,
-                    fontWeight: .w400,
-                  ),
-                ),
-              ),
-            ),
+            // Padding(
+            //   padding: const EdgeInsets.only(left: 30.0),
+            //   child: Container(
+            //     child: Text(
+            //       'it is the restaurant which has  amazing',
+            //       style: TextStyle(
+            //         color: Colors.black,
+            //         fontSize: 16,
+            //         fontWeight: .w400,
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            // Padding(
+            //   padding: const EdgeInsets.only(left: 30.0),
+            //   child: Container(
+            //     child: Text(
+            //       'menu Burger - steak , pizza , wrap, ',
+            //       style: TextStyle(
+            //         color: Colors.black,
+            //         fontSize: 16,
+            //         fontWeight: .w400,
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            // Padding(
+            //   padding: const EdgeInsets.only(left: 30.0),
+            //   child: Container(
+            //     child: Text(
+            //       'drinks , hot bar , salad bar and many  ',
+            //       style: TextStyle(
+            //         color: Colors.black,
+            //         fontSize: 16,
+            //         fontWeight: .w400,
+            //       ),
+            //     ),
+            //   ),
+            // ),
+            // Padding(
+            //   padding: const EdgeInsets.only(left: 30.0),
+            //   child: Container(
+            //     child: Text(
+            //       'taste',
+            //       style: TextStyle(
+            //         color: Colors.black,
+            //         fontSize: 16,
+            //         fontWeight: .w400,
+            //       ),
+            //     ),
+            //   ),
+            // ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
