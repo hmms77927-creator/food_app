@@ -2,7 +2,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_appnexts/account.dart';
 import 'package:flutter_application_appnexts/favorate.dart';
-import 'package:flutter_application_appnexts/firebase_options.dart';
 import 'package:flutter_application_appnexts/first.dart';
 import 'package:flutter_application_appnexts/first_1.dart';
 import 'package:flutter_application_appnexts/food_menu.dart';
@@ -16,12 +15,9 @@ import 'package:flutter_application_appnexts/registration.dart';
 import 'package:flutter_application_appnexts/registration_1.dart';
 import 'package:flutter_application_appnexts/resturant_menu.dart';
 import 'package:flutter_application_appnexts/setting.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
 
-<<<<<<< HEAD
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-=======
+import 'Services/wrapper.dart';
 import 'firebase_options.dart';
 
 
@@ -30,7 +26,6 @@ void main() async{
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
->>>>>>> 2afc647 (Initial commit)
   runApp(const MyApp());
 }
 
@@ -39,11 +34,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(colorScheme: .fromSeed(seedColor: Colors.deepPurple)),
-      home: Rating1(),
+      home:Wrapper(),
     );
   }
 }

@@ -1,6 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_appnexts/food_menu.dart';
 import 'package:flutter_application_appnexts/resturant_menu.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
 
 class Location1 extends StatefulWidget {
   const Location1({super.key});
@@ -10,8 +13,16 @@ class Location1 extends StatefulWidget {
 }
 
 class _Location1State extends State<Location1> {
+  late final Map data;
+  @override
+  void initState() {
+    data =Get.arguments ?? {};
+
+  }
   @override
   Widget build(BuildContext context) {
+    final imagePath = data['image'] ?? ''; // get image path
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -75,19 +86,32 @@ class _Location1State extends State<Location1> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(12.0),
+                  // child: Container(
+                  //   width: 135,
+                  //   height: 110,
+                  //   decoration: BoxDecoration(
+                  //     border: Border.all(
+                  //       color: Colors.transparent, // border color
+                  //       width: 1,
+                  //     ),
+                  //     borderRadius: BorderRadius.circular(12),
+                  //     image: DecorationImage(
+                  //       image: AssetImage(
+                  //         'assats/image/ecaa5c0d4bd618634326e8c00080ab106a4c9206.png',
+                  //       ),
+                  //       fit: BoxFit.cover,
+                  //     ),
+                  //   ),
+                  // ),
                   child: Container(
                     width: 135,
                     height: 110,
                     decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Colors.transparent, // border color
-                        width: 1,
-                      ),
                       borderRadius: BorderRadius.circular(12),
                       image: DecorationImage(
-                        image: AssetImage(
-                          'assats/image/ecaa5c0d4bd618634326e8c00080ab106a4c9206.png',
-                        ),
+                        image: imagePath != ''
+                            ? FileImage(File(imagePath)) as ImageProvider
+                            : AssetImage('assats/image/default.png'),
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -100,7 +124,7 @@ class _Location1State extends State<Location1> {
                       padding: const EdgeInsets.only(left: 4.0),
                       child: Container(
                         child: Text(
-                          'Le Courno Restaurant ',
+                          data['name']?? '',
                           style: TextStyle(
                             color: Color(0xFF181C2E),
                             fontSize: 18,
@@ -111,7 +135,7 @@ class _Location1State extends State<Location1> {
                     ),
                     Container(
                       child: Text(
-                        'Burger - Chicken - Riche \n - Wings ',
+                       data['description']??'',
                         style: TextStyle(
                           color: Color(0xFFA0A5BA),
                           fontSize: 14,
@@ -167,7 +191,7 @@ class _Location1State extends State<Location1> {
                         ),
                         Container(
                           child: Text(
-                            '12:00 PM   ',
+                          data['opening']??'',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: .w700,
@@ -208,7 +232,7 @@ class _Location1State extends State<Location1> {
                 ),
                 Container(
                   child: Text(
-                    'Distance: 1500 km away',
+                    'Distance: 1500 km',
                     style: TextStyle(fontSize: 17, fontWeight: .w700),
                   ),
                 ),

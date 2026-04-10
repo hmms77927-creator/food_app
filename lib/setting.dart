@@ -1,6 +1,10 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_appnexts/imge.dart';
 import 'package:flutter_application_appnexts/registration.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get_navigation/src/snackbar/snackbar.dart';
 
 class Setting extends StatefulWidget {
   const Setting({super.key});
@@ -10,6 +14,40 @@ class Setting extends StatefulWidget {
 }
 
 class _SettingState extends State<Setting> {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  // Fix 1: Proper logout method with error handling
+  Future<void> logout() async {
+    try {
+      await _auth.signOut();
+
+      // Clear any cached data if needed
+      // await Get.deleteAll(); // Optional: clear GetX controllers
+
+      // Navigate to registration screen and remove all previous routes
+      Get.offAll(() => const Registration());
+
+      // Show success message
+      Get.snackbar(
+        'Logout Successful',
+        'You have been logged out',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.green,
+        colorText: Colors.white,
+        duration: const Duration(seconds: 2),
+      );
+    } catch (e) {
+      print('Logout error: $e'); // Add logging for debugging
+      Get.snackbar(
+        'Logout Failed',
+        'Error: ${e.toString()}',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -164,10 +202,24 @@ class _SettingState extends State<Setting> {
           ),
           GestureDetector(
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => Registration()),
+              Get.defaultDialog(
+                title: "Logout",
+                middleText: "Are you sure you want to logout?",
+                textCancel: "No",
+                textConfirm: "Yes",
+                confirmTextColor: Colors.white,
+                onConfirm: () async {
+                  // Close dialog first
+                  Get.back();
+                  // Then perform logout
+                  await logout();
+                },
+                onCancel: () {
+                  Get.back(); // Close dialog without logging out
+                },
+                barrierDismissible: false,
               );
+
             },
             child: Center(
               child: SizedBox(

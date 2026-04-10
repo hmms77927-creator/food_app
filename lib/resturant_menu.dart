@@ -1,8 +1,9 @@
+import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_appnexts/location_1.dart';
 import 'package:flutter_application_appnexts/rating_1.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:get/get.dart';
 
 class ResturantMenu extends StatefulWidget {
   const ResturantMenu({super.key});
@@ -10,69 +11,83 @@ class ResturantMenu extends StatefulWidget {
   @override
   State<ResturantMenu> createState() => _ResturantMenuState();
 }
-
 class _ResturantMenuState extends State<ResturantMenu> {
-  final data = Get.arguments;
+  late final Map data;
+  @override
+  void initState() {
+    super.initState();
+    data = Get.arguments ?? {};
+  }
 
-  final String name = data['name'];
-  final String description = data['description'];
-  final String opening = data['opening'];
-  final String closing = data['closing'];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
       appBar: AppBar(
-        title: Text(
-          'Resturant Menu ',
+        title: const Text(
+          'Restaurant Menu',
           style: TextStyle(
             color: Colors.white,
             fontSize: 22,
-            fontWeight: .w700,
+            fontWeight: FontWeight.w700, // ✅ FIXED
           ),
         ),
         centerTitle: true,
-        backgroundColor: Color(0xFFEB4646),
+        backgroundColor: const Color(0xFFEB4646),
+
         leading: IconButton(
           style: IconButton.styleFrom(
             backgroundColor: Colors.white,
-            shape: CircleBorder(),
+            shape: const CircleBorder(),
           ),
           onPressed: () {
-            Navigator.pop(context);
+            Get.back();
           },
-          icon: Icon(Icons.arrow_back_ios_new),
+          icon: const Icon(Icons.arrow_back_ios_new),
         ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(Icons.menu_book, color: Colors.white),
-          ),
+
+        actions: const [
+          Padding(
+            padding: EdgeInsets.only(right: 10),
+            child: Icon(Icons.menu_book, color: Colors.white),
+          )
         ],
       ),
+
       body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: .start,
+          crossAxisAlignment: CrossAxisAlignment.start, // ✅ FIXED
           children: [
+
+            // 🔹 IMAGE SECTION
             SizedBox(
-              height: 350,
+              height: 300,
               child: Stack(
                 children: [
-                  Container(
+
+                  // Background Image
+                  SizedBox(
                     width: double.infinity,
-                    height: 280,
-                    child: Image.asset(
+                    height: 250,
+                    child: data['image'] != null
+                        ? Image.file(
+                      File(data['image']),
+                      fit: BoxFit.cover,
+                    )
+                        : Image.asset(
                       'assats/image/ecaa5c0d4bd618634326e8c00080ab106a4c9206 (2).png',
                       fit: BoxFit.cover,
                     ),
                   ),
+
+                  // Logo Image
                   Positioned(
-                    top: 234,
-                    left: 116,
-                    right: 116,
-                    child: Container(
-                      width: 137,
-                      height: 132,
+                    top: 200,
+                    left: 120,
+                    right: 120,
+                    child: SizedBox(
+                      height: 100,
                       child: Image.asset(
                         'assats/image/70E73AC6-BF5C-4785-92A2-1F14DF657095 2.png',
                       ),
@@ -81,273 +96,187 @@ class _ResturantMenuState extends State<ResturantMenu> {
                 ],
               ),
             ),
-            // Card(
-            Column(
-              crossAxisAlignment: .start,
+
+            const SizedBox(height: 10),
+
+            // 🔹 NAME
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                data['name'] ?? '',
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF181C2E),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 5),
+
+            // 🔹 DESCRIPTION
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                data['description'] ?? '',
+                style: const TextStyle(fontSize: 16),
+              ),
+            ),
+            const SizedBox(height: 10),
+            Row(
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 30.0),
-                  // child: Container(
-                  //   child: Text(
-                  //     'Le Courno’s Restorentie',
-                  //     style: TextStyle(
-                  //       color: Color(0xFF181C2E),
-                  //       fontSize: 24,
-                  //       fontWeight: .w700,
-                  //     ),
-                  //   ),
-                  // ),
-                  child: Container(
-                    child: Text(
-                      '$name',
-                      style: TextStyle(
-                        color: Color(0xFF181C2E),
-                        fontSize: 24,
-                        fontWeight: .w700,
-                      ),
+                IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.star, color: Color(0xFFEB4646)),
+                ),
+
+                StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance.collection('reviews').snapshots(),
+
+                  // stream: FirebaseFirestore.instance
+                  //     .collection('reviews')
+                  //     .where('restaurantId', isEqualTo: data['id']) // ✅ FILTER
+                  //     .snapshots(),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return const Text('0.0 (0)');
+                    }
+
+                    final docs = snapshot.data!.docs;
+                    int totalRatings = docs.length;
+
+                    double avgRating = 0;
+
+                    if (totalRatings > 0) {
+                      double sum = 0;
+
+                      for (var doc in docs) {
+                        final data = doc.data() as Map<String, dynamic>;
+                        sum += (data['rating'] ?? 0);
+                      }
+
+                      avgRating = sum / totalRatings;
+                    }
+
+                    return Row(
+                      children: [
+                        Text(
+                          avgRating.toStringAsFixed(1),
+                          style: const TextStyle(fontWeight: FontWeight.w700),
+                        ),
+                        const SizedBox(width: 10),
+                        Text('$totalRatings ratings'),
+                      ],
+                    );
+                  },
+                ),
+                const Spacer(),
+
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const Rating1()),
+                    );
+                  },
+                  child: const Text(
+                    'See Reviews',
+                    style: TextStyle(
+                      color: Color(0xFFEB4646),
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
-                // Padding(
-                //   padding: const EdgeInsets.only(left: 30.0),
-                //   child: Container(
-                //     child: Text(
-                //       'Burger - Chicken - Riche - Wings ',
-                //       style: TextStyle(
-                //         color: Color(0xFF181C2E),
-                //         fontSize: 20,
-                //         fontWeight: .w400,
-                //       ),
-                //     ),
-                //   ),
-                // ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 30.0),
-                  child: Container(
-                    child: Text(
-                      '$description ',
-                      style: TextStyle(
-                        color: Color(0xFF181C2E),
-                        fontSize: 20,
-                        fontWeight: .w400,
-                      ),
-                    ),
-                  ),
-                ),
-                Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: IconButton(
-                        onPressed: () {},
-                        icon: Icon(Icons.star_border, color: Color(0xFFEB4646)),
-                      ),
-                    ),
-                    Text(
-                      '4.7',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                        fontWeight: .w700,
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 15.0),
-                      child: Container(
-                        child: Text(
-                          '5000+ ratings',
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 17,
-                            fontWeight: .w400,
-                          ),
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => Rating1()),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 8.0),
-                        child: Container(
-                          child: Text(
-                            'See Reviews',
-                            style: TextStyle(
-                              color: Color(0xFFEB4646),
-                              fontSize: 16,
-                              fontWeight: .w700,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                const SizedBox(width: 10),
               ],
             ),
+            const SizedBox(height: 10),
+
+            // 🔹 OPENING / CLOSING
             Padding(
-              padding: const EdgeInsets.only(left: 30.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
                 children: [
-                  // Container(
-                  //   child: Text(
-                  //     'Open : ',
-                  //     style: TextStyle(
-                  //       fontSize: 14,
-                  //       fontWeight: .w700,
-                  //       color: Colors.black,
-                  //     ),
-                  //   ),
-                  // ),
-                  Container(
-                    child: Text(
-                      'Open :$opening ',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: .w700,
-                        color: Colors.black,
-                      ),
-                    ),
+                  const Text(
+                    'Open: ',
+                    style: TextStyle(fontWeight: FontWeight.w700),
                   ),
-                  // Container(
-                  //   child: Text(
-                  //     '12:00 PM   ',
-                  //     style: TextStyle(
-                  //       fontSize: 14,
-                  //       fontWeight: .w700,
-                  //       color: Colors.green,
-                  //     ),
-                  //   ),
-                  // ),
-                  Container(
-                    child: Text(
-                      '5000+ ratings',
-                      style: TextStyle(
-                        color: Color(0xFF808080),
-                        fontSize: 17,
-                        fontWeight: .w400,
-                      ),
-                    ),
+                  Text(
+                    data['opening'] ?? '',
+                    style: const TextStyle(color: Colors.green),
+                  ),
+                  const SizedBox(width: 20),
+                  const Text(
+                    'Close: ',
+                    style: TextStyle(fontWeight: FontWeight.w700),
+                  ),
+                  Text(
+                    data['closing'] ?? '',
+                    style: const TextStyle(color: Colors.red),
                   ),
                 ],
               ),
             ),
 
-            // Padding(
-            //   padding: const EdgeInsets.only(left: 30.0),
-            //   child: Container(
-            //     child: Text(
-            //       'Description',
-            //       style: TextStyle(
-            //         color: Colors.black,
-            //         fontSize: 22,
-            //         fontWeight: .w700,
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            Padding(
-              padding: const EdgeInsets.only(left: 30.0),
-              child: Container(
-                child: Text(
-                  '$description',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 22,
-                    fontWeight: .w700,
-                  ),
+            const SizedBox(height: 20),
+
+            // 🔹 DESCRIPTION TITLE
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                'Description',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
             ),
-            // Padding(
-            //   padding: const EdgeInsets.only(left: 30.0),
-            //   child: Container(
-            //     child: Text(
-            //       'it is the restaurant which has  amazing',
-            //       style: TextStyle(
-            //         color: Colors.black,
-            //         fontSize: 16,
-            //         fontWeight: .w400,
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // Padding(
-            //   padding: const EdgeInsets.only(left: 30.0),
-            //   child: Container(
-            //     child: Text(
-            //       'menu Burger - steak , pizza , wrap, ',
-            //       style: TextStyle(
-            //         color: Colors.black,
-            //         fontSize: 16,
-            //         fontWeight: .w400,
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // Padding(
-            //   padding: const EdgeInsets.only(left: 30.0),
-            //   child: Container(
-            //     child: Text(
-            //       'drinks , hot bar , salad bar and many  ',
-            //       style: TextStyle(
-            //         color: Colors.black,
-            //         fontSize: 16,
-            //         fontWeight: .w400,
-            //       ),
-            //     ),
-            //   ),
-            // ),
-            // Padding(
-            //   padding: const EdgeInsets.only(left: 30.0),
-            //   child: Container(
-            //     child: Text(
-            //       'taste',
-            //       style: TextStyle(
-            //         color: Colors.black,
-            //         fontSize: 16,
-            //         fontWeight: .w400,
-            //       ),
-            //     ),
-            //   ),
-            // ),
+
+            const SizedBox(height: 10),
+
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text(
+                data['description'] ?? '',
+                style: const TextStyle(fontSize: 16),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // 🔹 BUTTON ROW
+            Padding(
+              padding: const EdgeInsets.all(10),
               child: Row(
-                mainAxisAlignment: .spaceEvenly,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly, // ✅ FIXED
                 children: [
+
                   SizedBox(
-                    width: 250,
-                    height: 40,
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        backgroundColor: Color(0xFFEB4646),
+                    width: 220,
+                    height: 45,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFEB4646),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadiusGeometry.circular(10),
-                          side: BorderSide(color: Color(0xFFEB4646)),
+                          borderRadius: BorderRadius.circular(10),
                         ),
                       ),
                       onPressed: () {},
-                      child: Text(
+                      child: const Text(
                         'Moderate',
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
                   ),
+
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Location1()),
+                        MaterialPageRoute(builder: (_) => const Location1()),
                       );
                     },
-                    child: Container(
-                      child: Image.asset('assats/image/Vector.png'),
-                    ),
+                    child: Image.asset('assats/image/Vector.png'),
                   ),
                 ],
               ),
@@ -358,3 +287,4 @@ class _ResturantMenuState extends State<ResturantMenu> {
     );
   }
 }
+
