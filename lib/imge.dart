@@ -1,130 +1,184 @@
-// // import 'dart:io';
-// // import 'package:cloud_firestore/cloud_firestore.dart';
-// // import 'package:dotted_decoration/dotted_decoration.dart';
-// // import 'package:flutter/material.dart';
-// // import 'package:get/get.dart';
-// // import 'package:image_picker/image_picker.dart';
-// // import 'Widget/textfield.dart';
-// //
-// // class Imge extends StatefulWidget {
-// //   const Imge({super.key});
-// //
-// //   @override
-// //   State<Imge> createState() => _ImgeState();
-// // }
-// //
-// // class _ImgeState extends State<Imge> {
-// //   TextEditingController resturantnamecontroller = TextEditingController();
-// //   TextEditingController descriptioncontroller = TextEditingController();
-// //   TextEditingController openingcontroller = TextEditingController();
-// //   TextEditingController closingcontroller = TextEditingController();
-// //
-// //   RxString imagePath = ''.obs;
-// //
-// //   Future pickImage() async {
-// //     final ImagePicker picker = ImagePicker();
-// //     final XFile? image = await picker.pickImage(
-// //       source: ImageSource.gallery, // Change to camera if needed
-// //     );
-// //     if (image != null) {
-// //       imagePath.value = image.path;
-// //     }
-// //   }
-// //
-// //   Future uploadData() async {
-// //     if (imagePath.value == '') {
-// //       Get.snackbar('Error', 'Please select an image first');
-// //       return;
-// //     }
-// //
-// //     await FirebaseFirestore.instance.collection('add_restaurant').add({
-// //       'name': resturantnamecontroller.text,
-// //       'description': descriptioncontroller.text,
-// //       'opening': openingcontroller.text,
-// //       'closing': closingcontroller.text,
-// //       'image_path': imagePath.value, // save local path for now
-// //     }).then((value) {
-// //       Get.snackbar('Success', 'Restaurant added successfully');
-// //       // Clear after upload
-// //       resturantnamecontroller.clear();
-// //       descriptioncontroller.clear();
-// //       openingcontroller.clear();
-// //       closingcontroller.clear();
-// //       imagePath.value = '';
-// //     }).catchError((error) {
-// //       Get.snackbar('Error', 'Failed to add restaurant: $error');
-// //     });
-// //   }
-// //
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return Scaffold(
-// //       appBar: AppBar(
-// //         title: Text('Upload', style: TextStyle(color: Color(0xFF181C2E), fontSize: 20, fontWeight: FontWeight.w400)),
-// //         centerTitle: true,
-// //       ),
-// //       body: SingleChildScrollView(
-// //         child: Column(
-// //           children: [
-// //             Center(
-// //               child: Obx(() => GestureDetector(
-// //                 onTap: pickImage,
-// //                 child: Container(
-// //                   height: 258,
-// //                   width: 342,
-// //                   decoration: DottedDecoration(shape: Shape.box),
-// //                   child: imagePath.value == ''
-// //                       ? Column(
-// //                     mainAxisAlignment: MainAxisAlignment.center,
-// //                     children: [
-// //                       Image.asset('assats/image/Upload icon (1).png', width: 58, height: 46),
-// //                       SizedBox(height: 10),
-// //                       Text('Click to upload image'),
-// //                       Text('Supported formats: JPEG, PNG, GIF, MP4, PDF'),
-// //                     ],
-// //                   )
-// //                       : Image.file(File(imagePath.value), fit: BoxFit.cover),
-// //                 ),
-// //               )),
-// //             ),
-// //             SizedBox(height: 20),
-// //             CustomTextField(text: 'Resturant Name', controller: resturantnamecontroller),
-// //             CustomTextField(text: 'Description', controller: descriptioncontroller),
-// //             CustomTextField(text: 'Opening Time', controller: openingcontroller),
-// //             CustomTextField(text: 'Closing', controller: closingcontroller),
-// //             SizedBox(height: 20),
-// //             SizedBox(
-// //               height: 45,
-// //               width: 240,
-// //               child: ElevatedButton(
-// //                 onPressed: uploadData,
-// //                 style: ElevatedButton.styleFrom(
-// //                   backgroundColor: Color(0xFFEB4646),
-// //                   shape: RoundedRectangleBorder(
-// //                     borderRadius: BorderRadius.circular(10),
-// //                   ),
-// //                 ),
-// //                 child: Text('Pick Image & Upload', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
-// //               ),
-// //             ),
-// //           ],
-// //         ),
-// //       ),
-// //     );
-// //   }
-// // }
+// import 'dart:io';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:flutter/material.dart';
+// import 'package:get/get.dart';
+// import 'package:image_picker/image_picker.dart';
 //
+// class Imge extends StatefulWidget {
+//   const Imge({super.key});
+//
+//   @override
+//   State<Imge> createState() => _ImgeState();
+// }
+//
+// class _ImgeState extends State<Imge> {
+//
+//   TextEditingController nameController = TextEditingController();
+//   TextEditingController descController = TextEditingController();
+//   TextEditingController openController = TextEditingController();
+//   TextEditingController closeController = TextEditingController();
+//
+//   RxString imagePath = ''.obs;
+//
+//   final docRef = FirebaseFirestore.instance
+//       .collection('add_restaurant')
+//       .doc('userRestaurant');
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     loadData();
+//   }
+//
+//   Future<void> loadData() async {
+//     final doc = await docRef.get();
+//
+//     if (doc.exists) {
+//       final data = doc.data() as Map<String, dynamic>;
+//
+//       nameController.text = data['name'] ?? '';
+//       descController.text = data['description'] ?? '';
+//       openController.text = data['opening'] ?? '';
+//       closeController.text = data['closing'] ?? '';
+//       imagePath.value = data['image_path'] ?? '';
+//     }
+//   }
+//
+//   Future pickImage() async {
+//     final picker = ImagePicker();
+//     final image = await picker.pickImage(source: ImageSource.gallery);
+//
+//     if (image != null) {
+//       imagePath.value = image.path;
+//     }
+//   }
+//
+//   Future saveData() async {
+//     await docRef.set({
+//       'name': nameController.text,
+//       'description': descController.text,
+//       'opening': openController.text,
+//       'closing': closeController.text,
+//       'image_path': imagePath.value,
+//     });
+//
+//     Get.snackbar("Success", "Data Saved Successfully");
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text("Restaurant Edit"),
+//         centerTitle: true,
+//       ),
+//
+//       body: SingleChildScrollView(
+//         padding: const EdgeInsets.all(16),
+//         child: Column(
+//           children: [
+//
+//             // IMAGE
+//             Obx(() {
+//               return GestureDetector(
+//                 onTap: pickImage,
+//                 child: Container(
+//                   height: 180,
+//                   width: double.infinity,
+//                   decoration: BoxDecoration(
+//                     border: Border.all(color: Colors.grey),
+//                   ),
+//                   child: imagePath.value == ''
+//                       ? const Center(child: Text("Tap to select image"))
+//                       : Image.file(File(imagePath.value), fit: BoxFit.cover),
+//                 ),
+//               );
+//             }),
+//
+//             const SizedBox(height: 20),
+//
+//             // NAME
+//             TextField(
+//               controller: nameController,
+//               decoration: InputDecoration(
+//                 border: OutlineInputBorder(
+//                   borderRadius: BorderRadius.circular(12),
+//                   borderSide: BorderSide(color: Color(0xFFBEC5D1)),
+//                 ),                labelText: "Restaurant Name",
+//               ),
+//             ),
+//
+//             const SizedBox(height: 10),
+//
+//             // DESCRIPTION
+//             TextField(
+//               controller: descController,
+//               decoration: InputDecoration(
+//                 border: OutlineInputBorder(
+//                   borderRadius: BorderRadius.circular(12),
+//                   borderSide: BorderSide(color: Color(0xFFBEC5D1)),
+//                 ),                labelText: "Description",
+//               ),
+//             ),
+//
+//             const SizedBox(height: 10),
+//
+//             // OPEN
+//             TextField(
+//               controller: openController,
+//               decoration: InputDecoration(
+//                 border: OutlineInputBorder(
+//                   borderRadius: BorderRadius.circular(12),
+//                   borderSide: BorderSide(color: Color(0xFFBEC5D1)),
+//                 ),                labelText: "Opening Time",
+//               ),
+//             ),
+//
+//             const SizedBox(height: 10),
+//
+//             // CLOSE
+//             TextField(
+//               controller: closeController,
+//               decoration: InputDecoration(
+//                 border: OutlineInputBorder(
+//                   borderRadius: BorderRadius.circular(12),
+//                   borderSide: BorderSide(color: Color(0xFFBEC5D1)),
+//                 ),
+//                 labelText: "Closing Time",
+//               ),
+//             ),
+//
+//             const SizedBox(height: 20),
+//
+//             // SAVE BUTTON
+//             SizedBox(
+//               width: double.infinity,
+//               height: 50,
+//               child: ElevatedButton(
+//                 onPressed: saveData,
+//                 style: ElevatedButton.styleFrom(
+//                   backgroundColor: Color(0xFFEB4646),
+//                   shape: RoundedRectangleBorder(
+//                     borderRadius: BorderRadius.circular(10),
+//                   ),
+//                 ),
+//                 child: Text('Save', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
+//               ),
+//             ),
+//
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 import 'dart:io';
-import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dotted_decoration/dotted_decoration.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_appnexts/resturant_menu.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'Models/model_users.dart';
-import 'Widget/textfield.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geocoding/geocoding.dart';
 
 class Imge extends StatefulWidget {
   const Imge({super.key});
@@ -134,152 +188,180 @@ class Imge extends StatefulWidget {
 }
 
 class _ImgeState extends State<Imge> {
-
-
-  TextEditingController resturantnamecontroller = TextEditingController();
-  TextEditingController descriptioncontroller = TextEditingController();
-  TextEditingController openingcontroller = TextEditingController();
-  TextEditingController closingcontroller = TextEditingController();
+  TextEditingController nameController = TextEditingController();
+  TextEditingController descController = TextEditingController();
+  TextEditingController openController = TextEditingController();
+  TextEditingController closeController = TextEditingController();
+  TextEditingController locationController = TextEditingController();
 
   RxString imagePath = ''.obs;
 
+  GoogleMapController? mapController;
+
+  // ⭐ DEFAULT LOCATION (NEVER NULL)
+  LatLng selectedLocation = const LatLng(31.5204, 74.3587);
+
+  final docRef = FirebaseFirestore.instance
+      .collection('add_restaurant')
+      .doc('userRestaurant');
+
+  @override
+  void initState() {
+    super.initState();
+    loadData();
+  }
+
+  // ================= LOAD DATA =================
+  Future<void> loadData() async {
+    final doc = await docRef.get();
+
+    if (doc.exists) {
+      final data = doc.data() as Map<String, dynamic>;
+
+      nameController.text = data['name'] ?? '';
+      descController.text = data['description'] ?? '';
+      openController.text = data['opening'] ?? '';
+      closeController.text = data['closing'] ?? '';
+      locationController.text = data['location'] ?? '';
+      imagePath.value = data['image_path'] ?? '';
+
+      double lat = data['lat'] ?? 31.5204;
+      double lng = data['lng'] ?? 74.3587;
+
+      selectedLocation = LatLng(lat, lng);
+    }
+  }
+
+  // ================= IMAGE =================
   Future pickImage() async {
-    final ImagePicker picker = ImagePicker();
-    final XFile? image = await picker.pickImage(
-      source: ImageSource.gallery, // Change to camera if needed
-    );
+    final picker = ImagePicker();
+    final image = await picker.pickImage(source: ImageSource.gallery);
+
     if (image != null) {
       imagePath.value = image.path;
     }
   }
 
-  // Future uploadData() async {
-  //   if (imagePath.value == '') {
-  //     Get.snackbar('Error', 'Please select an image first');
-  //     return;
-  //   }
-  //   Get.to(ResturantMenu(), arguments: {
-  //     'name': name,
-  //     'description': description,
-  //     'opening': opening,
-  //     'closing': closing,
-  //     'image': imagePath.value,
-  //   });
-  //   await FirebaseFirestore.instance.collection('add_restaurant').add({
-  //     'name': resturantnamecontroller.text,
-  //     'description': descriptioncontroller.text,
-  //     'opening': openingcontroller.text,
-  //     'closing': closingcontroller.text,
-  //     'image_path': imagePath.value, // save local path for now
-  //   // }).then((value) {
-  //   )};
-  //
-  //     Get.snackbar('Success', 'Restaurant added successfully');
-  //     // Clear after upload
-  //     resturantnamecontroller.clear();
-  //     descriptioncontroller.clear();
-  //     openingcontroller.clear();
-  //     closingcontroller.clear();
-  //     imagePath.value = '';
-  //   }).catchError((error) {
-  //     Get.snackbar('Error', 'Failed to add restaurant: $error');
-  //   });
-  // }
-  Future uploadData() async {
-    if (imagePath.value == '') {
-      Get.snackbar('Error', 'Please select an image first');
-      return;
-    }
-
-    String name = resturantnamecontroller.text.trim();
-    String description = descriptioncontroller.text.trim();
-    String opening = openingcontroller.text.trim();
-    String closing = closingcontroller.text.trim();
-
-    if (name.isEmpty || description.isEmpty || opening.isEmpty || closing.isEmpty) {
-      Get.snackbar('Error', 'All fields required');
-      return;
-    }
-
+  // ================= SEARCH LOCATION =================
+  Future<void> searchLocation(String place) async {
     try {
+      List<Location> locations = await locationFromAddress(place);
+      Location loc = locations.first;
 
-      await FirebaseFirestore.instance.collection('add_restaurant').add({
-        'name': name,
-        'description': description,
-        'opening': opening,
-        'closing': closing,
-        'image_path': imagePath.value, // ✅ SAME KEY
+      setState(() {
+        selectedLocation = LatLng(loc.latitude, loc.longitude);
       });
 
-      // ✅ NAVIGATION WITH ARGUMENTS
-      // Get.to(
-      //       () =>  ResturantMenu(),
-      //   arguments: {
-      //     'name': name,
-      //     'description': description,
-      //     'opening': opening,
-      //     'closing': closing,
-      //     'image': imagePath.value,
-      //   },
-      // );
-
-      Get.snackbar('Success', 'Data Added');
-
+      mapController?.animateCamera(
+        CameraUpdate.newLatLngZoom(selectedLocation, 15),
+      );
     } catch (e) {
-      print(e); // ✅ DEBUG
-      Get.snackbar('Error', e.toString());
+      Get.snackbar("Error", "Location not found");
     }
   }
+
+  // ================= SAVE =================
+  Future saveData() async {
+    await docRef.set({
+      'name': nameController.text,
+      'description': descController.text,
+      'opening': openController.text,
+      'closing': closeController.text,
+      'image_path': imagePath.value,
+      'location': locationController.text,
+
+      // ⭐ NEVER NULL NOW
+      'lat': selectedLocation.latitude,
+      'lng': selectedLocation.longitude,
+    });
+
+    Get.snackbar("Success", "Saved Successfully");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Upload', style: TextStyle(color: Color(0xFF181C2E), fontSize: 20, fontWeight: FontWeight.w400)),
-        centerTitle: true,
+        title: const Text("Restaurant Map"),
+        backgroundColor: const Color(0xFFEB4646),
       ),
+
       body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Center(
-              child: Obx(() => GestureDetector(
+
+            // ================= IMAGE =================
+            Obx(() {
+              return GestureDetector(
                 onTap: pickImage,
                 child: Container(
-                  height: 258,
-                  width: 342,
-                  decoration: DottedDecoration(shape: Shape.box),
-                  child: imagePath.value == ''
-                      ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset('assats/image/Upload icon (1).png', width: 58, height: 46),
-                      SizedBox(height: 10),
-                      Text('Click to upload image'),
-                      Text('Supported formats: JPEG, PNG, GIF, MP4, PDF'),
-                    ],
-                  )
+                  height: 180,
+                  width: double.infinity,
+                  decoration: BoxDecoration(border: Border.all()),
+                  child: imagePath.value.isEmpty
+                      ? const Center(child: Text("Pick Image"))
                       : Image.file(File(imagePath.value), fit: BoxFit.cover),
                 ),
-              )),
-            ),
-            SizedBox(height: 20),
-            CustomTextField(text: 'Resturant Name', controller: resturantnamecontroller),
-            CustomTextField(text: 'Description', controller: descriptioncontroller),
-            CustomTextField(text: 'Opening Time', controller: openingcontroller),
-            CustomTextField(text: 'Closing', controller: closingcontroller),
-            SizedBox(height: 20),
-            SizedBox(
-              height: 45,
-              width: 240,
-              child: ElevatedButton(
-                onPressed: uploadData,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFFEB4646),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text('Pick Image & Upload', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w700)),
+              );
+            }),
+
+            const SizedBox(height: 10),
+
+            TextField(controller: nameController, decoration: const InputDecoration(labelText: "Name")),
+            TextField(controller: descController, decoration: const InputDecoration(labelText: "Description")),
+            TextField(controller: openController, decoration: const InputDecoration(labelText: "Opening")),
+            TextField(controller: closeController, decoration: const InputDecoration(labelText: "Closing")),
+
+            // ================= SEARCH =================
+            TextField(
+              controller: locationController,
+              onSubmitted: searchLocation,
+              decoration: const InputDecoration(
+                labelText: "Search Location",
+                suffixIcon: Icon(Icons.search),
               ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // ================= MAP =================
+            SizedBox(
+              height: 250,
+              child: GoogleMap(
+                onMapCreated: (controller) {
+                  mapController = controller;
+                },
+
+                // ⭐ TAP TO CHANGE LOCATION
+                onTap: (pos) {
+                  setState(() {
+                    selectedLocation = pos;
+                  });
+                },
+
+                initialCameraPosition: CameraPosition(
+                  target: selectedLocation,
+                  zoom: 12,
+                ),
+
+                markers: {
+                  Marker(
+                    markerId: const MarkerId("restaurant"),
+                    position: selectedLocation,
+                  ),
+                },
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFEB4646),
+              ),
+              onPressed: saveData,
+              child: const Text("Save"),
             ),
           ],
         ),

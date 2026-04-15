@@ -139,6 +139,7 @@ class _Rating1State extends State<Rating1> {
 
                   // ================= AVERAGE CARD =================
                   Card(
+                    color: Colors.white,
                     elevation: 2,
                     child: Padding(
                       padding: const EdgeInsets.all(12.0),
@@ -245,6 +246,7 @@ class _Rating1State extends State<Rating1> {
                         docs[index].data() as Map<String, dynamic>;
 
                         return Card(
+                          color: Colors.white,
                           margin: const EdgeInsets.symmetric(vertical: 6),
                           child: ListTile(
                             leading: CircleAvatar(

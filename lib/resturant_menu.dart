@@ -132,11 +132,6 @@ class _ResturantMenuState extends State<ResturantMenu> {
 
                 StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance.collection('reviews').snapshots(),
-
-                  // stream: FirebaseFirestore.instance
-                  //     .collection('reviews')
-                  //     .where('restaurantId', isEqualTo: data['id']) // ✅ FILTER
-                  //     .snapshots(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData) {
                       return const Text('0.0 (0)');
@@ -171,7 +166,6 @@ class _ResturantMenuState extends State<ResturantMenu> {
                   },
                 ),
                 const Spacer(),
-
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
@@ -219,8 +213,6 @@ class _ResturantMenuState extends State<ResturantMenu> {
             ),
 
             const SizedBox(height: 20),
-
-            // 🔹 DESCRIPTION TITLE
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Text(
@@ -231,9 +223,7 @@ class _ResturantMenuState extends State<ResturantMenu> {
                 ),
               ),
             ),
-
             const SizedBox(height: 10),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(

@@ -1,9 +1,237 @@
+// import 'dart:io';
+// import 'package:flutter/material.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
+// import 'package:geolocator/geolocator.dart';
+// import 'package:geocoding/geocoding.dart';
+// import 'package:get/get.dart';
+// import 'package:flutter_application_appnexts/food_menu.dart';
+//
+// class Location1 extends StatefulWidget {
+//   const Location1({super.key});
+//
+//   @override
+//   State<Location1> createState() => _Location1State();
+// }
+//
+// class _Location1State extends State<Location1> {
+//   late GoogleMapController mapController;
+//   final LatLng _center = const LatLng(31.5204, 74.3587);
+//   LatLng? currentLocation;
+//   LatLng? searchedLocation;
+//   late final Map data;
+//   TextEditingController searchController = TextEditingController();
+//   @override
+//   void initState() {
+//     super.initState();
+//     data = Get.arguments ?? {};
+//     getCurrentLocation();
+//   }
+//   void _onMapCreated(GoogleMapController controller) {
+//     mapController = controller;
+//   }
+//   Future<void> getCurrentLocation() async {
+//     bool serviceEnabled;
+//     LocationPermission permission;
+//     serviceEnabled = await Geolocator.isLocationServiceEnabled();
+//     if (!serviceEnabled) return;
+//     permission = await Geolocator.checkPermission();
+//     if (permission == LocationPermission.denied) {
+//       permission = await Geolocator.requestPermission();
+//       if (permission == LocationPermission.denied) return;
+//     }
+//     if (permission == LocationPermission.deniedForever) return;
+//     Position position = await Geolocator.getCurrentPosition(
+//       desiredAccuracy: LocationAccuracy.high,
+//     );
+//     setState(() {
+//       currentLocation = LatLng(position.latitude, position.longitude);
+//     });
+//   }
+//   Future<void> searchLocation(String place) async {
+//     try {
+//       List<Location> locations = await locationFromAddress(place);
+//       Location loc = locations.first;
+//       LatLng newPos = LatLng(loc.latitude, loc.longitude);
+//       setState(() {
+//         searchedLocation = newPos;
+//       });
+//
+//       mapController.animateCamera(
+//         CameraUpdate.newCameraPosition(
+//           CameraPosition(target: newPos, zoom: 14),
+//         ),
+//       );
+//     } catch (e) {
+//       print("Location not found");
+//     }
+//   }
+//   @override
+//   Widget build(BuildContext context) {
+//     final imagePath = data['image'] ?? '';
+//     return Scaffold(
+//       backgroundColor: Colors.white,
+//       appBar: AppBar(
+//         backgroundColor: Color(0xFFEB4646),
+//         leading: IconButton(
+//           style: IconButton.styleFrom(
+//             backgroundColor: Colors.white,
+//             shape: CircleBorder(),
+//           ),
+//           onPressed: () {
+//             Navigator.pop(context);
+//           },
+//           icon: Icon(Icons.arrow_back_ios_new),
+//         ),
+//         title: SizedBox(
+//           width: 300,
+//           height: 45,
+//           child: TextField(
+//             controller: searchController,
+//             onSubmitted: searchLocation,
+//             decoration: InputDecoration(
+//               hintText: "Search location",
+//               prefixIcon: Icon(Icons.search),
+//               filled: true,
+//               fillColor: Colors.white,
+//               border: OutlineInputBorder(
+//                 borderRadius: BorderRadius.circular(10),
+//               ),
+//             ),
+//           ),
+//         ),
+//       ),
+//       body: Stack(
+//         children: [
+//           GoogleMap(
+//             onMapCreated: _onMapCreated,
+//             initialCameraPosition: CameraPosition(
+//               target: _center,
+//               zoom: 14,
+//             ),
+//             markers: {
+//               Marker(
+//                 markerId: MarkerId("restaurant"),
+//                 position: _center,
+//                 infoWindow: InfoWindow(
+//                   title: data['name'] ?? '',
+//                   snippet: data['description'] ?? '',
+//                 ),
+//               ),
+//               if (currentLocation != null)
+//                 Marker(
+//                   markerId: MarkerId("me"),
+//                   position: currentLocation!,
+//                   icon: BitmapDescriptor.defaultMarkerWithHue(
+//                     BitmapDescriptor.hueBlue,
+//                   ),
+//                   infoWindow: InfoWindow(title: "My Location"),
+//                 ),
+//               if (searchedLocation != null)
+//                 Marker(
+//                   markerId: MarkerId("search"),
+//                   position: searchedLocation!,
+//                   icon: BitmapDescriptor.defaultMarkerWithHue(
+//                     BitmapDescriptor.hueRed,
+//                   ),
+//                   infoWindow: InfoWindow(title: "Search Location"),
+//                 ),
+//             },
+//             myLocationEnabled: true,
+//             myLocationButtonEnabled: true,
+//             zoomGesturesEnabled: true,
+//             rotateGesturesEnabled: true,
+//           ),
+//           Align(
+//             alignment: Alignment.bottomCenter,
+//             child: Container(
+//               width: double.infinity,
+//               padding: EdgeInsets.all(12),
+//               decoration: BoxDecoration(
+//                 color: Colors.white,
+//                 borderRadius: BorderRadius.only(
+//                   topLeft: Radius.circular(20),
+//                   topRight: Radius.circular(20),
+//                 ),
+//               ),
+//               child: Column(
+//                 mainAxisSize: MainAxisSize.min,
+//                 children: [
+//                   Row(
+//                     children: [
+//                       Container(
+//                         width: 120,
+//                         height: 100,
+//                         decoration: BoxDecoration(
+//                           borderRadius: BorderRadius.circular(12),
+//                           image: DecorationImage(
+//                             image: imagePath != ''
+//                                 ? FileImage(File(imagePath))
+//                                 : AssetImage('assats/image/default.png'),
+//                             fit: BoxFit.cover,
+//                           ),
+//                         ),
+//                       ),
+//                       SizedBox(width: 10),
+//                       Expanded(
+//                         child: Column(
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           children: [
+//                             Text(data['name'] ?? '',
+//                                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+//                             Text(data['description'] ?? ''),
+//                             Text("Open: ${data['opening'] ?? ''}",
+//                                 style: TextStyle(color: Colors.green)),
+//                           ],
+//                         ),
+//                       ),
+//                     ],
+//                   ),
+//                   SizedBox(height: 10),
+//                   Row(
+//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+//                     children: [
+//                       Padding(
+//                         padding: const EdgeInsets.only(left: 10.0, top: 2),
+//                         child: TextButton.icon(
+//                           style: TextButton.styleFrom(
+//                             backgroundColor: const Color(0xFFEB4646),
+//                             shape: RoundedRectangleBorder(
+//                               borderRadius: BorderRadius.circular(10),
+//                               side: const BorderSide(color: Color(0xFFEB4646)),
+//                             ),
+//                           ),
+//                           onPressed: () {
+//                             Get.to(FoodMenu());
+//                           },
+//                           icon: const Icon(Icons.menu_book, color: Colors.white),
+//                           label: const Text('view menu', style: TextStyle(color: Colors.white)),
+//                         ),
+//                       ),
+//
+//                       FloatingActionButton(
+//                         mini: true,
+//                         onPressed: getCurrentLocation,
+//                         child: Icon(Icons.my_location),
+//                       ),
+//                     ],
+//                   ),
+//                 ],
+//               ),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_appnexts/food_menu.dart';
-import 'package:flutter_application_appnexts/resturant_menu.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
+import 'package:get/get.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'food_menu.dart';
 
 class Location1 extends StatefulWidget {
   const Location1({super.key});
@@ -13,233 +241,335 @@ class Location1 extends StatefulWidget {
 }
 
 class _Location1State extends State<Location1> {
+
+  GoogleMapController? mapController;
+
   late final Map data;
+
+  TextEditingController searchController = TextEditingController();
+
+  LatLng? currentLocation;
+  LatLng? searchedLocation;
+  LatLng? restaurantLocation;
+
+  bool mapReady = false;
+
   @override
   void initState() {
-    data =Get.arguments ?? {};
+    super.initState();
+    data = Get.arguments ?? {};
 
+    getCurrentLocation();
+    loadRestaurantLocation();
   }
+
+  // ================= MAP CREATED =================
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+    mapReady = true;
+
+    if (restaurantLocation != null) {
+      mapController!.animateCamera(
+        CameraUpdate.newLatLngZoom(restaurantLocation!, 15),
+      );
+    }
+  }
+
+  // ================= CURRENT LOCATION =================
+  Future<void> getCurrentLocation() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) return;
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) return;
+    }
+
+    if (permission == LocationPermission.deniedForever) return;
+
+    Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high,
+    );
+
+    setState(() {
+      currentLocation = LatLng(position.latitude, position.longitude);
+    });
+  }
+
+  // ================= LOAD RESTAURANT LOCATION =================
+  Future<void> loadRestaurantLocation() async {
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('add_restaurant')
+          .doc('userRestaurant')
+          .get();
+
+      if (doc.exists) {
+        final d = doc.data() as Map<String, dynamic>;
+
+        double? lat = d['lat'];
+        double? lng = d['lng'];
+
+        if (lat != null && lng != null) {
+          setState(() {
+            restaurantLocation = LatLng(lat, lng);
+          });
+
+          if (mapReady && mapController != null) {
+            mapController!.animateCamera(
+              CameraUpdate.newLatLngZoom(restaurantLocation!, 15),
+            );
+          }
+        }
+      }
+    } catch (e) {
+      print("Error loading location: $e");
+    }
+  }
+
+  // ================= SEARCH LOCATION =================
+  Future<void> searchLocation(String place) async {
+    try {
+      List<Location> locations = await locationFromAddress(place);
+      Location loc = locations.first;
+
+      setState(() {
+        searchedLocation = LatLng(loc.latitude, loc.longitude);
+      });
+
+      mapController?.animateCamera(
+        CameraUpdate.newLatLngZoom(searchedLocation!, 14),
+      );
+    } catch (e) {
+      Get.snackbar("Error", "Location not found");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final imagePath = data['image'] ?? ''; // get image path
+    final imagePath = data['image'] ?? '';
 
     return Scaffold(
       backgroundColor: Colors.white,
+
+      // ================= APPBAR =================
       appBar: AppBar(
-        title: Container(
-          child: SizedBox(
-            width: 301,
-            height: 49,
-            child: TextField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                hintText: 'Enter Your Location',
-                hintStyle: TextStyle(color: Colors.black),
-                prefix: IconButton(
-                  onPressed: () {},
-                  icon: Icon(Icons.search, color: Colors.black),
-                ),
-                suffix: Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
-                  child: CircleAvatar(
-                    radius: 20,
-                    backgroundImage: AssetImage(
-                      'assats/image/dbf3866bf07ccc1f5838969233a534fc7019a31c.png',
-                    ),
-                  ),
-                ),
-                fillColor: Colors.white,
-                filled: true,
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-            ),
-          ),
-        ),
-        backgroundColor: Color(0xFFEB4646),
+        backgroundColor: const Color(0xFFEB4646),
         leading: IconButton(
           style: IconButton.styleFrom(
             backgroundColor: Colors.white,
-            shape: CircleBorder(),
+            shape: const CircleBorder(),
           ),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          icon: Icon(Icons.arrow_back_ios_new),
+          onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back_ios_new),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              width: double.infinity,
-              height: 551,
-              child: Image.asset(
-                'assats/image/dd36c1b8bd76638d992ab7e29a0cd2c6606c4115.png',
-                fit: BoxFit.cover,
+        title: SizedBox(
+          height: 45,
+          child: TextField(
+            controller: searchController,
+            onSubmitted: searchLocation,
+            decoration: InputDecoration(
+              hintText: "Search location",
+              prefixIcon: const Icon(Icons.search),
+              filled: true,
+              fillColor: Colors.white,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
               ),
             ),
-            Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  // child: Container(
-                  //   width: 135,
-                  //   height: 110,
-                  //   decoration: BoxDecoration(
-                  //     border: Border.all(
-                  //       color: Colors.transparent, // border color
-                  //       width: 1,
-                  //     ),
-                  //     borderRadius: BorderRadius.circular(12),
-                  //     image: DecorationImage(
-                  //       image: AssetImage(
-                  //         'assats/image/ecaa5c0d4bd618634326e8c00080ab106a4c9206.png',
-                  //       ),
-                  //       fit: BoxFit.cover,
-                  //     ),
-                  //   ),
-                  // ),
-                  child: Container(
-                    width: 135,
-                    height: 110,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      image: DecorationImage(
-                        image: imagePath != ''
-                            ? FileImage(File(imagePath)) as ImageProvider
-                            : AssetImage('assats/image/default.png'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: .start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 4.0),
-                      child: Container(
-                        child: Text(
-                          data['name']?? '',
-                          style: TextStyle(
-                            color: Color(0xFF181C2E),
-                            fontSize: 18,
-                            fontWeight: .w400,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Container(
-                      child: Text(
-                       data['description']??'',
-                        style: TextStyle(
-                          color: Color(0xFFA0A5BA),
-                          fontSize: 14,
-                          fontWeight: .w400,
-                        ),
-                      ),
-                    ),
-                    // Container(
-                    //   child: Text(
-                    //     '- Wings  ',
-                    //     style: TextStyle(
-                    //       color: Color(0xFFA0A5BA),
-                    //       fontSize: 14,
-                    //       fontWeight: .w400,
-                    //     ),
-                    //   ),
-                    // ),
-                    Row(
-                      mainAxisAlignment: .start,
-                      children: [
-                        Container(
-                          child: IconButton(
-                            onPressed: () {},
-                            icon: Icon(
-                              Icons.star_border,
-                              color: Color(0xFFEB4646),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          child: Text(
-                            '4.7',
-                            style: TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
-                              fontWeight: .w700,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Container(
-                          child: Text(
-                            'Open : ',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: .w700,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          child: Text(
-                          data['opening']??'',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: .w700,
-                              color: Colors.green,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: TextButton.icon(
-                    style: TextButton.styleFrom(
-                      backgroundColor: Color(0xFFEB4646),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadiusGeometry.circular(10),
-                        side: BorderSide(color: Color(0xFFEB4646)),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => FoodMenu()),
-                      );
-                    },
-                    label: Text(
-                      'view menu',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    icon: Icon(Icons.menu_book, color: Colors.white),
-                  ),
-                ),
-                Container(
-                  child: Text(
-                    'Distance: 1500 km',
-                    style: TextStyle(fontSize: 17, fontWeight: .w700),
-                  ),
-                ),
-              ],
-            ),
-          ],
+          ),
         ),
+      ),
+
+      // ================= BODY =================
+      body: Stack(
+        children: [
+
+          // ================= GOOGLE MAP =================
+          // GoogleMap(
+          //   onMapCreated: _onMapCreated,
+          //
+          //   initialCameraPosition: CameraPosition(
+          //     target: restaurantLocation ??
+          //         const LatLng(31.5204, 74.3587),
+          //     zoom: 14,
+          //   ),
+          //
+          //   markers: {
+          //
+          //     // ⭐ RESTAURANT PIN (IMGE SCREEN LOCATION)
+          //     if (restaurantLocation != null)
+          //       Marker(
+          //         markerId: const MarkerId("restaurant"),
+          //         position: restaurantLocation!,
+          //         infoWindow: InfoWindow(
+          //           title: data['name'] ?? '',
+          //           snippet: data['description'] ?? '',
+          //         ),
+          //       ),
+          //
+          //     // ⭐ CURRENT LOCATION
+          //     if (currentLocation != null)
+          //       Marker(
+          //         markerId: const MarkerId("me"),
+          //         position: currentLocation!,
+          //         icon: BitmapDescriptor.defaultMarkerWithHue(
+          //           BitmapDescriptor.hueBlue,
+          //         ),
+          //         infoWindow: const InfoWindow(title: "My Location"),
+          //       ),
+          //
+          //     // ⭐ SEARCH LOCATION
+          //     if (searchedLocation != null)
+          //       Marker(
+          //         markerId: const MarkerId("search"),
+          //         position: searchedLocation!,
+          //         icon: BitmapDescriptor.defaultMarkerWithHue(
+          //           BitmapDescriptor.hueRed,
+          //         ),
+          //         infoWindow: const InfoWindow(title: "Search Location"),
+          //       ),
+          //   },
+          //
+          //   myLocationEnabled: true,
+          //   myLocationButtonEnabled: true,
+          //   zoomGesturesEnabled: true,
+          // ),
+
+          StreamBuilder<DocumentSnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('add_restaurant')
+                .doc('userRestaurant')
+                .snapshots(),
+
+            builder: (context, snapshot) {
+
+              if (!snapshot.hasData) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              final data = snapshot.data!.data() as Map<String, dynamic>;
+
+              LatLng restaurantLocation = LatLng(
+                data['lat'] ?? 31.5204,
+                data['lng'] ?? 74.3587,
+              );
+
+              return GoogleMap(
+                initialCameraPosition: CameraPosition(
+                  target: restaurantLocation,
+                  zoom: 14,
+                ),
+
+                markers: {
+                  Marker(
+                    markerId: const MarkerId("restaurant"),
+                    position: restaurantLocation,
+                    infoWindow: InfoWindow(
+                      title: data['name'] ?? '',
+                      snippet: data['description'] ?? '',
+                    ),
+                  ),
+                },
+              );
+            },
+          ),
+          // ================= BOTTOM CARD =================
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+
+                  Row(
+                    children: [
+
+                      Container(
+                        width: 120,
+                        height: 100,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          image: DecorationImage(
+                            image: imagePath != ''
+                                ? FileImage(File(imagePath))
+                                : const AssetImage(
+                              'assats/image/default.png',
+                            ) as ImageProvider,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 10),
+
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              data['name'] ?? '',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(data['description'] ?? ''),
+                            Text(
+                              "Open: ${data['opening'] ?? ''}",
+                              style: const TextStyle(color: Colors.green),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+
+                      TextButton.icon(
+                        style: TextButton.styleFrom(
+                          backgroundColor: const Color(0xFFEB4646),
+                        ),
+                        onPressed: () {
+                          Get.to(() => FoodMenu());
+                        },
+                        icon: const Icon(Icons.menu_book, color: Colors.white),
+                        label: const Text(
+                          'view menu',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+
+                      FloatingActionButton(
+                        mini: true,
+                        onPressed: getCurrentLocation,
+                        child: const Icon(Icons.my_location),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
