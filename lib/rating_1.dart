@@ -14,8 +14,6 @@ class Rating1 extends StatefulWidget {
 class _Rating1State extends State<Rating1> {
   double userRating = 0.0;
   TextEditingController reviewController = TextEditingController();
-
-  // ================= GET USER DATA =================
   Future<Map<String, dynamic>?> getUserData() async {
     final uid = FirebaseAuth.instance.currentUser!.uid;
 
@@ -37,8 +35,6 @@ class _Rating1State extends State<Rating1> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
-      // ================= APP BAR (SAME UI) =================
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(150),
         child: SizedBox(
@@ -96,8 +92,6 @@ class _Rating1State extends State<Rating1> {
           ),
         ),
       ),
-
-      // ================= BODY =================
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('reviews')

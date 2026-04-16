@@ -54,19 +54,14 @@ class _ResturantMenuState extends State<ResturantMenu> {
           )
         ],
       ),
-
       body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start, // ✅ FIXED
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
-            // 🔹 IMAGE SECTION
             SizedBox(
               height: 300,
               child: Stack(
                 children: [
-
-                  // Background Image
                   SizedBox(
                     width: double.infinity,
                     height: 250,
@@ -80,8 +75,6 @@ class _ResturantMenuState extends State<ResturantMenu> {
                       fit: BoxFit.cover,
                     ),
                   ),
-
-                  // Logo Image
                   Positioned(
                     top: 200,
                     left: 120,
@@ -233,12 +226,10 @@ class _ResturantMenuState extends State<ResturantMenu> {
             ),
 
             const SizedBox(height: 20),
-
-            // 🔹 BUTTON ROW
             Padding(
               padding: const EdgeInsets.all(10),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly, // ✅ FIXED
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
 
                   SizedBox(
