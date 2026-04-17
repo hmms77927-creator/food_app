@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_appnexts/location_1.dart';
+import 'package:flutter_application_appnexts/location_1.dart' hide Icon;
 import 'package:flutter_application_appnexts/rating_1.dart';
 import 'package:get/get.dart';
 
@@ -252,10 +252,10 @@ class _ResturantMenuState extends State<ResturantMenu> {
 
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const Location1()),
-                      );
+                      // Navigator.push(
+                      //   context,
+                      //   MaterialPageRoute(builder: (_) => const Location1()),
+                      // );
                     },
                     child: Image.asset('assats/image/Vector.png'),
                   ),

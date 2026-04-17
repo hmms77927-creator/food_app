@@ -2,12 +2,12 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'package:flutter_application_appnexts/update_1.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dra_home.dart';
 import 'location_1.dart';
+import 'map_1.dart';
 import 'resturant_menu.dart';
 import 'home_v1.dart';
 
@@ -625,21 +625,23 @@ class _HomeV1State extends State<HomeV1> {
                                     padding: const EdgeInsets.only(left: 10.0),
                                     child: GestureDetector(
                                       onTap: () {
-                                        Get.to(Location1(),arguments:{
-                                          'name':name,
-                                          'description':description,
-                                          'opening':opening,
-                                          'image':imagePath,
-                                        } );
+                                        Get.to(() => Location1(), arguments: {
+                                          "docId": doc.id,
+                                          "name": name,
+                                          "description": description,
+                                          "opening": opening,
+                                          "closing": closing,
+                                          "image": imagePath,
+                                          "lat": data["lat"],
+                                          "lng": data["lng"],
+                                        });
                                       },
-                                      child: Image.asset('assats/image/Vector.png',fit: BoxFit.cover,),
+                                      child: Image.asset('assats/image/Vector.png'),
                                     ),
                                   ),
                                 ],
                               ),
-
                             ]),
-
                         ),
                       ),
                     );

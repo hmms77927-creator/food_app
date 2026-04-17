@@ -172,6 +172,8 @@
 //     );
 //   }
 // }
+//
+
 
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -179,8 +181,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:geocoding/geocoding.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'map_1.dart';
 
@@ -198,86 +199,76 @@ class _ImgeState extends State<Imge> {
   TextEditingController closeController = TextEditingController();
   TextEditingController locationController = TextEditingController();
 
-  GoogleMapController? mapController;
-
   String imagePath = '';
-  LatLng selectedLocation = const LatLng(31.5204, 74.3587);
 
-  /// ✅ ONE USER = ONE DOC
-  final String uid = FirebaseAuth.instance.currentUser!.uid;
+  final uid = FirebaseAuth.instance.currentUser!.uid;
 
-  late final DocumentReference docRef = FirebaseFirestore.instance
-      .collection('add_restaurant')
-      .doc(uid);
+  late final docRef =
+  FirebaseFirestore.instance.collection('add_restaurant').doc(uid);
 
   @override
   void initState() {
     super.initState();
     loadData();
+    loadSavedLocation();
   }
-  Future<void> loadData() async {
+
+  Future<void> loadSavedLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? loc = prefs.getString("saved_location");
+
+    if (loc != null) {
+      setState(() {
+        locationController.text = loc;
+      });
+    }
+  }
+
+  /// 🖼 PICK IMAGE
+  Future pickImage() async {
+    final picker = ImagePicker();
+    final img = await picker.pickImage(source: ImageSource.gallery);
+
+    if (img != null) {
+      setState(() {
+        imagePath = img.path;
+      });
+    }
+  }
+
+  /// ☁️ LOAD FIRESTORE DATA
+  Future loadData() async {
     final doc = await docRef.get();
 
     if (doc.exists) {
       final data = doc.data() as Map<String, dynamic>;
 
-      nameController.text = data['name'] ?? '';
-      descController.text = data['description'] ?? '';
-      openController.text = data['opening'] ?? '';
-      closeController.text = data['closing'] ?? '';
-      // locationController.text = data['location'] ?? '';
-      imagePath = data['image_path'] ?? '';
-
-      // double lat = (data['lat'] ?? 31.5204).toDouble();
-      // double lng = (data['lng'] ?? 74.3587).toDouble();
-
-      // selectedLocation = LatLng(lat, lng);
-
-      setState(() {});
-    }
-  }
-  Future pickImage() async {
-    final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.gallery);
-
-    if (image != null) {
       setState(() {
-        imagePath = image.path;
+        nameController.text = data["name"] ?? "";
+        descController.text = data["description"] ?? "";
+        openController.text = data["opening"] ?? "";
+        closeController.text = data["closing"] ?? "";
+        locationController.text = data["location"] ?? "";
+        imagePath = data["image_path"] ?? "";
       });
     }
   }
-  // Future<void> searchLocation(String place) async {
-  //   try {
-  //     List<Location> locations = await locationFromAddress(place);
-  //
-  //     if (locations.isEmpty) return;
-  //
-  //     final loc = locations.first;
-  //
-  //     setState(() {
-  //       selectedLocation = LatLng(loc.latitude, loc.longitude);
-  //     });
-  //
-  //     mapController?.animateCamera(
-  //       CameraUpdate.newLatLngZoom(selectedLocation, 15),
-  //     );
-  //   } catch (e) {
-  //     Get.snackbar("Error", "Location not found");
-  //   }
-  // }
+
+  /// 💾 SAVE DATA (FIRESTORE + LOCAL)
   Future saveData() async {
     await docRef.set({
-      'name': nameController.text,
-      'description': descController.text,
-      'opening': openController.text,
-      'closing': closeController.text,
-      'location': locationController.text,
-      'image_path': imagePath,
-      // 'lat': selectedLocation.latitude,
-      // 'lng': selectedLocation.longitude,
-      'uid': uid,
-      'updatedAt': FieldValue.serverTimestamp(),
-    });
+      "name": nameController.text,
+      "description": descController.text,
+      "opening": openController.text,
+      "closing": closeController.text,
+      "location": locationController.text,
+      "image_path": imagePath,
+      "uid": uid,
+      "updatedAt": FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString("saved_location", locationController.text);
 
     Get.snackbar("Success", "Saved Successfully");
   }
@@ -286,109 +277,250 @@ class _ImgeState extends State<Imge> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Restaurant Map"),
+        title: const Text("Restaurant"),
         backgroundColor: const Color(0xFFEB4646),
       ),
 
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            GestureDetector(
-              onTap: pickImage,
-              child: Container(
-                height: 180,
-                width: double.infinity,
-                decoration: BoxDecoration(border: Border.all()),
-                child: imagePath.isEmpty
-                    ? const Center(child: Text("Pick Image"))
-                    : Image.file(File(imagePath), fit: BoxFit.cover),
-              ),
-            ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
 
-            const SizedBox(height: 10),
-
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(labelText: "Name"),
-            ),
-            TextField(
-              controller: descController,
-              decoration: const InputDecoration(labelText: "Description"),
-            ),
-            TextField(
-              controller: openController,
-              decoration: const InputDecoration(labelText: "Opening"),
-            ),
-            TextField(
-              controller: closeController,
-              decoration: const InputDecoration(labelText: "Closing"),
-            ),
-
-            // GestureDetector(
-            //   onTap: (){
-            //     Get.to( Map1());
-            //   },
-            //   child: TextField(
-            //     controller: locationController,
-            //     // onSubmitted: searchLocation,
-            //     decoration: const InputDecoration(
-            //       labelText: "Search Location",
-            //       suffixIcon: Icon(Icons.search),
-            //     ),
-            //   ),
-            // ),
-            GestureDetector(
-              onTap: () {
-                Get.to(() => const Map1());
-              },
-              child: AbsorbPointer(
-                child: TextField(
-                  controller: locationController,
-                  decoration: const InputDecoration(
-                    labelText: "Search Location",
-                    suffixIcon: Icon(Icons.search),
+              /// 🖼 IMAGE PICKER
+              GestureDetector(
+                onTap: pickImage,
+                child: Container(
+                  height: 180,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.grey),
                   ),
+                  child: imagePath.isEmpty
+                      ? const Center(child: Text("Pick Image"))
+                      : Image.file(File(imagePath), fit: BoxFit.cover),
                 ),
               ),
-            ),
-            // const SizedBox(height: 10),
-            // SizedBox(
-            //   height: 250,
-            //   child: GoogleMap(
-            //     onMapCreated: (controller) {
-            //       mapController = controller;
-            //     },
-            //     onTap: (pos) {
-            //       setState(() {
-            //         selectedLocation = pos;
-            //       });
-            //     },
-            //     initialCameraPosition: CameraPosition(
-            //       target: selectedLocation,
-            //       zoom: 12,
-            //     ),
-            //     markers: {
-            //       Marker(
-            //         markerId: const MarkerId("restaurant"),
-            //         position: selectedLocation,
-            //       ),
-            //     },
-            //   ),
-            // ),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 10),
 
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFEB4646),
+              TextField(controller: nameController, decoration:InputDecoration(
+                labelText: "Name",
+                border: OutlineInputBorder(),
+              ),),
+              TextField(controller: descController, decoration:InputDecoration(
+                labelText: "description",
+                border: OutlineInputBorder(),
+              ),),
+              TextField(controller: openController, decoration:InputDecoration(
+                labelText: "Open",
+                border: OutlineInputBorder(),
+              ),),
+              TextField(controller: closeController, decoration:InputDecoration(
+                labelText: "Close",
+                border: OutlineInputBorder(),
+              ),),
+
+              const SizedBox(height: 10),
+
+              /// 📍 LOCATION FIELD (FULL FIX)
+              TextField(
+                controller: locationController,
+                readOnly: true,
+                onTap: () async {
+                  final result = await Get.to(() => const SearchScreen());
+
+                  if (result != null && result.toString().isNotEmpty) {
+                    setState(() {
+                      locationController.text = result;
+                    });
+
+                    final prefs = await SharedPreferences.getInstance();
+                    await prefs.setString("saved_location", result);
+                  }
+                },
+                decoration: const InputDecoration(
+                  labelText: "Search Location",
+                  suffixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(),
+                ),
               ),
-              onPressed: saveData,
-              child: const Text("Save"),
-            ),
-          ],
+
+              const SizedBox(height: 20),
+
+              /// 💾 SAVE BUTTON
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFFEB4646),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 50,
+                    vertical: 12,
+                  ),
+                ),
+                onPressed: saveData,
+                child: const Text("Save"),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
+
+
+// import 'dart:io';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
+// import 'package:flutter/material.dart';
+// import 'package:get/get.dart';
+// import 'package:image_picker/image_picker.dart';
+// import 'package:google_maps_flutter/google_maps_flutter.dart';
+// import 'package:geocoding/geocoding.dart';
+//
+// import 'map_1.dart';
+//
+// class Imge extends StatefulWidget {
+//   const Imge({super.key});
+//
+//   @override
+//   State<Imge> createState() => _ImgeState();
+// }
+//
+// class _ImgeState extends State<Imge> {
+//   TextEditingController nameController = TextEditingController();
+//   TextEditingController descController = TextEditingController();
+//   TextEditingController openController = TextEditingController();
+//   TextEditingController closeController = TextEditingController();
+//   TextEditingController locationController = TextEditingController();
+//
+//   GoogleMapController? mapController;
+//
+//   String imagePath = '';
+//   LatLng selectedLocation = const LatLng(31.5204, 74.3587);
+//
+//   final String uid = FirebaseAuth.instance.currentUser!.uid;
+//
+//   late final DocumentReference docRef = FirebaseFirestore.instance
+//       .collection('add_restaurant')
+//       .doc(uid);
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     loadData();
+//   }
+//   Future<void> loadData() async {
+//     final doc = await docRef.get();
+//
+//     if (doc.exists) {
+//       final data = doc.data() as Map<String, dynamic>;
+//
+//       nameController.text = data['name'] ?? '';
+//       descController.text = data['description'] ?? '';
+//       openController.text = data['opening'] ?? '';
+//       closeController.text = data['closing'] ?? '';
+//       imagePath = data['image_path'] ?? '';
+//
+//       setState(() {});
+//     }
+//   }
+//   Future pickImage() async {
+//     final picker = ImagePicker();
+//     final image = await picker.pickImage(source: ImageSource.gallery);
+//
+//     if (image != null) {
+//       setState(() {
+//         imagePath = image.path;
+//       });
+//     }
+//   }
+//   Future saveData() async {
+//     await docRef.set({
+//       'name': nameController.text,
+//       'description': descController.text,
+//       'opening': openController.text,
+//       'closing': closeController.text,
+//       'location': locationController.text,
+//       'image_path': imagePath,
+//       // 'lat': selectedLocation.latitude,
+//       // 'lng': selectedLocation.longitude,
+//       'uid': uid,
+//       'updatedAt': FieldValue.serverTimestamp(),
+//     });
+//
+//     Get.snackbar("Success", "Saved Successfully");
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text("Restaurant Map"),
+//         backgroundColor: const Color(0xFFEB4646),
+//       ),
+//
+//       body: SingleChildScrollView(
+//         padding: const EdgeInsets.all(16),
+//         child: Column(
+//           children: [
+//             GestureDetector(
+//               onTap: pickImage,
+//               child: Container(
+//                 height: 180,
+//                 width: double.infinity,
+//                 decoration: BoxDecoration(border: Border.all()),
+//                 child: imagePath.isEmpty
+//                     ? const Center(child: Text("Pick Image"))
+//                     : Image.file(File(imagePath), fit: BoxFit.cover),
+//               ),
+//             ),
+//
+//             const SizedBox(height: 10),
+//
+//             TextField(
+//               controller: nameController,
+//               decoration: const InputDecoration(labelText: "Name"),
+//             ),
+//             TextField(
+//               controller: descController,
+//               decoration: const InputDecoration(labelText: "Description"),
+//             ),
+//             TextField(
+//               controller: openController,
+//               decoration: const InputDecoration(labelText: "Opening"),
+//             ),
+//             TextField(
+//               controller: closeController,
+//               decoration: const InputDecoration(labelText: "Closing"),
+//             ),
+//             GestureDetector(
+//               onTap: () {
+//                 Get.to(() => const SearchScreen());
+//               },
+//               child: AbsorbPointer(
+//                 child: TextField(
+//                   controller: locationController,
+//                   decoration: const InputDecoration(
+//                     labelText: "Search Location",
+//                     suffixIcon: Icon(Icons.search),
+//                   ),
+//                 ),
+//               ),
+//             ),
+//
+//             const SizedBox(height: 20),
+//
+//             ElevatedButton(
+//               style: ElevatedButton.styleFrom(
+//                 backgroundColor: const Color(0xFFEB4646),
+//               ),
+//               onPressed: saveData,
+//               child: const Text("Save"),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
