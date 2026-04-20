@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_application_appnexts/home_V1.dart';
+import 'package:flutter_application_appnexts/home_V1.dart' hide HomeV1;
 import 'package:flutter_application_appnexts/registration_1.dart';
 
 import '../first.dart';
+import '../home_v1.dart';
 
 class Wrapper extends StatefulWidget {
   const Wrapper({super.key});

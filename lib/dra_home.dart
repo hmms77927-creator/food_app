@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart'; // Add this import
 import 'package:flutter/material.dart';
 import 'package:flutter_application_appnexts/notes.dart';
 import 'package:flutter_application_appnexts/rating_1.dart';
+import 'package:flutter_application_appnexts/recpies.dart';
 import 'package:flutter_application_appnexts/registration.dart';
 import 'package:flutter_application_appnexts/setting.dart';
 import 'package:get/get.dart';
@@ -18,19 +19,10 @@ class DraHome extends StatefulWidget {
 class _DraHomeState extends State<DraHome> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  // Fix 1: Proper logout method with error handling
   Future<void> logout() async {
     try {
       await _auth.signOut();
-
-      // Clear any cached data if needed
-      // await Get.deleteAll(); // Optional: clear GetX controllers
-
-      // Navigate to registration screen and remove all previous routes
       Get.offAll(() => const Registration());
-
-      // Show success message
       Get.snackbar(
         'Logout Successful',
         'You have been logged out',
@@ -225,6 +217,26 @@ class _DraHomeState extends State<DraHome> {
                         onTap: () {
                           Navigator.push(context,MaterialPageRoute(builder: (context)=> Rating1()));
                           },
+                      ),
+
+
+                      ListTile(
+                        leading: Image.asset(
+                          'assats/image/Frame (3).png',
+                          width: 22,
+                          height: 22,
+                        ),
+                        title: const Text(
+                          'Recipies',
+                          style: TextStyle(
+                            color: Color(0xFF344151),
+                            fontSize: 18,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        onTap: () {
+                          Navigator.push(context,MaterialPageRoute(builder: (context)=>RecipesScreen()));
+                        },
                       ),
                       ListTile(
                         leading: Image.asset(

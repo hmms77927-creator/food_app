@@ -2,8 +2,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_appnexts/home_V1.dart';
+import 'package:flutter_application_appnexts/home_V1.dart' hide HomeV1;
 import 'package:google_sign_in/google_sign_in.dart';
+
+import 'home_v1.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,10 +39,8 @@ class _RegistrationState extends State<Registration> {
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
-
-      // Firestore: UID as doc ID
       await FirebaseFirestore.instance
-          .collection('users') // Recommended collection name
+          .collection('users')
           .doc(userCredential.user!.uid)
           .set({
         'name': nameController.text.trim(),
@@ -51,8 +51,6 @@ class _RegistrationState extends State<Registration> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Signup Successful!")),
       );
-
-      // Navigate to HomeV1
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomeV1()),

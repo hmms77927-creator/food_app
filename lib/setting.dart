@@ -13,8 +13,6 @@ class Setting extends StatefulWidget {
 
 class _SettingState extends State<Setting> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  // ================= RESET PASSWORD =================
   Future<void> resetPassword(String email) async {
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(
@@ -37,7 +35,6 @@ class _SettingState extends State<Setting> {
     }
   }
 
-  // ================= LOGOUT =================
   Future<void> logout() async {
     try {
       await _auth.signOut();

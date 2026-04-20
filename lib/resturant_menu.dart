@@ -30,7 +30,7 @@ class _ResturantMenuState extends State<ResturantMenu> {
           style: TextStyle(
             color: Colors.white,
             fontSize: 22,
-            fontWeight: FontWeight.w700, // ✅ FIXED
+            fontWeight: FontWeight.w700,
           ),
         ),
         centerTitle: true,
@@ -92,7 +92,6 @@ class _ResturantMenuState extends State<ResturantMenu> {
 
             const SizedBox(height: 10),
 
-            // 🔹 NAME
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
@@ -106,8 +105,6 @@ class _ResturantMenuState extends State<ResturantMenu> {
             ),
 
             const SizedBox(height: 5),
-
-            // 🔹 DESCRIPTION
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
@@ -178,8 +175,6 @@ class _ResturantMenuState extends State<ResturantMenu> {
               ],
             ),
             const SizedBox(height: 10),
-
-            // 🔹 OPENING / CLOSING
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
@@ -252,10 +247,10 @@ class _ResturantMenuState extends State<ResturantMenu> {
 
                   GestureDetector(
                     onTap: () {
-                      // Navigator.push(
-                      //   context,
-                      //   MaterialPageRoute(builder: (_) => const Location1()),
-                      // );
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const Location1()),
+                      );
                     },
                     child: Image.asset('assats/image/Vector.png'),
                   ),

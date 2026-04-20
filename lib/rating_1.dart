@@ -24,8 +24,6 @@ class _Rating1State extends State<Rating1> {
 
     return doc.data();
   }
-
-  // ================= FORMAT DATE =================
   String formatDate(Timestamp timestamp) {
     final date = timestamp.toDate();
     return DateFormat('dd MMM yyyy • hh:mm a').format(date);
@@ -105,11 +103,8 @@ class _Rating1State extends State<Rating1> {
           final docs = snapshot.data?.docs ?? [];
 
           int totalRatings = docs.length;
-
-          // ================= AVERAGE =================
           double avgRating = 0;
           Map<int, int> starCount = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0};
-
           if (totalRatings > 0) {
             double sum = 0;
             for (var doc in docs) {
@@ -123,15 +118,12 @@ class _Rating1State extends State<Rating1> {
             }
             avgRating = sum / totalRatings;
           }
-
           return SingleChildScrollView(
             child: Padding(
               padding: const EdgeInsets.all(12.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
-                  // ================= AVERAGE CARD =================
                   Card(
                     color: Colors.white,
                     elevation: 2,
@@ -224,10 +216,7 @@ class _Rating1State extends State<Rating1> {
                     style: TextStyle(
                         fontSize: 22, fontWeight: FontWeight.bold),
                   ),
-
                   const SizedBox(height: 10),
-
-                  // ================= REVIEWS =================
                   if (docs.isEmpty)
                     const Text('No Reviews Yet')
                   else
@@ -238,7 +227,6 @@ class _Rating1State extends State<Rating1> {
                       itemBuilder: (context, index) {
                         final data =
                         docs[index].data() as Map<String, dynamic>;
-
                         return Card(
                           color: Colors.white,
                           margin: const EdgeInsets.symmetric(vertical: 6),
@@ -273,15 +261,9 @@ class _Rating1State extends State<Rating1> {
                                     ),
                                   ),
                                 ),
-
                                 const SizedBox(height: 4),
-
-                                // 📝 review
                                 Text(data['review'] ?? ''),
-
                                 const SizedBox(height: 4),
-
-                                // ⏰ date & time
                                 Text(
                                   data['createdAt'] != null
                                       ? formatDate(
@@ -369,7 +351,6 @@ class _Rating1State extends State<Rating1> {
                       ),
                     ),
                   ),
-
                   const SizedBox(height: 20),
                 ],
               ),

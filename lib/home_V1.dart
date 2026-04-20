@@ -1,30 +1,15 @@
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_appnexts/update_1.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'dra_home.dart';
+import 'Models/model_users.dart';
 import 'location_1.dart';
-import 'map_1.dart';
 import 'resturant_menu.dart';
-import 'home_v1.dart';
-
-class FavourateItem {
-  String resturantname;
-  String description;
-  String opening;
-  String closing;
-  String? imagePath;
-  FavourateItem({
-    required this.resturantname,
-    required this.description,
-    required this.opening,
-    required this.closing,
-    this.imagePath,
-  });
-}
+import 'update_1.dart';
+import 'dra_home.dart';
 
 class HomeV1 extends StatefulWidget {
   const HomeV1({super.key});
@@ -34,7 +19,7 @@ class HomeV1 extends StatefulWidget {
 }
 
 class _HomeV1State extends State<HomeV1> {
-
+  final uid = FirebaseAuth.instance.currentUser?.uid;
   String getGreeting() {
     final hour = DateTime.now().hour;
 
@@ -48,7 +33,6 @@ class _HomeV1State extends State<HomeV1> {
       return "Good Night!";
     }
   }
-
   List<FavourateItem> favoriteList = [];
   final String favKey = "favorite_list";
 
@@ -95,10 +79,17 @@ class _HomeV1State extends State<HomeV1> {
     return favoriteList.any((e) => e.resturantname == name);
   }
 
+
   void toggleFavorite(FavourateItem item) {
     setState(() {
-      if (isFavorite(item.resturantname)) {
-        favoriteList.removeWhere((e) => e.resturantname == item.resturantname);
+      final exists = favoriteList.any(
+            (e) => e.resturantname == item.resturantname,
+      );
+
+      if (exists) {
+        favoriteList.removeWhere(
+              (e) => e.resturantname == item.resturantname,
+        );
       } else {
         favoriteList.add(item);
       }
@@ -141,7 +132,7 @@ class _HomeV1State extends State<HomeV1> {
         borderRadius: BorderRadius.circular(39),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.15),
+            color: Colors.black.withOpacity(0.1),
             blurRadius: 8,
           )
         ],
@@ -150,11 +141,11 @@ class _HomeV1State extends State<HomeV1> {
         mainAxisSize: MainAxisSize.min,
         children: [
           CircleAvatar(
-            radius: 20, // 🔴 reduce size (important)
+            radius: 20,
             backgroundImage: AssetImage(image),
           ),
           SizedBox(width: 6),
-          Flexible( // 🔴 FIX overflow
+          Flexible(
             child: Text(
               title,
               overflow: TextOverflow.ellipsis,
@@ -168,13 +159,13 @@ class _HomeV1State extends State<HomeV1> {
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       drawer: const DraHome(),
-
-      floatingActionButton: FloatingActionButton(
+        floatingActionButton: FloatingActionButton(
         backgroundColor:  Colors.white,
         child: const Icon(Icons.favorite,color:Color(0xFFEB4646),),
         onPressed: () {
@@ -186,10 +177,9 @@ class _HomeV1State extends State<HomeV1> {
           );
         },
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-                Stack(
+      body: Column(
+        children: [
+          Stack(
                   children: [
                     Container(
                       height: 250,
@@ -252,7 +242,7 @@ class _HomeV1State extends State<HomeV1> {
                                       StreamBuilder<DocumentSnapshot>(
                                         stream: FirebaseFirestore.instance
                                             .collection('add_restaurant')
-                                            .doc('userRestaurant') // 👈 SAME DOC
+                                            .doc(uid)
                                             .snapshots(),
                                         builder: (context, snapshot) {
 
@@ -264,7 +254,7 @@ class _HomeV1State extends State<HomeV1> {
                                           final name = data['name'] ?? '';
 
                                           return Text(
-                                            name, // 👈 YAHI SHOW HOGA (Karachi Biryani)
+                                            name,
                                             style: const TextStyle(
                                               color: Color(0xFF181C2E),
                                               fontWeight: FontWeight.w400,
@@ -322,7 +312,8 @@ class _HomeV1State extends State<HomeV1> {
                         child: TextField(
                           controller: searchController,
                           onChanged: (value){setState(() {
-
+searchController.text=value.toLowerCase();
+searchController.selection=TextSelection.fromPosition(TextPosition(offset: searchController.text.length));
                           });},
                           decoration: InputDecoration(
                             hintText: 'Search dishes, restaurants',
@@ -348,98 +339,103 @@ class _HomeV1State extends State<HomeV1> {
                     ),
                   ],
                 ),
-            const SizedBox(height: 20),
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: toggleSeeAll,
-                    child: Text(
-                      'See All',
-                      style: TextStyle(fontSize: 16),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  onTap: toggleSeeAll,
+                  child: Text(
+                    'See All',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back_ios),
+                      onPressed: scrollLeft,
                     ),
-                  ),
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.arrow_back_ios),
-                        onPressed: scrollLeft,
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.arrow_forward_ios),
-                        onPressed: scrollRight,
-                      ),
-                    ],
-                  )
-                ],
-              ),
+                    IconButton(
+                      icon: Icon(Icons.arrow_forward_ios),
+                      onPressed: scrollRight,
+                    ),
+                  ],
+                )
+              ],
             ),
-            SizedBox(
-              height: 60,
-              child: ListView(
-                controller: _scrollController,
-                scrollDirection: Axis.horizontal,
-                padding: EdgeInsets.symmetric(horizontal: 10),
-                children: [
-                  categoryItem(
-                    "All",
-                    "assats/image/34f428e47c8da57a9f796e1596d68f1688fa073a.png",
-                    true,
-                  ),
-                  categoryItem(
-                    "Hot Dog",
-                    "assats/image/30fc202b681cf552fb8011ec1be440edbee3f301.png",
-                    false,
-                  ),
-                  categoryItem(
-                    "Burger",
-                    "assats/image/cbd8173438dd01c6f5e642f129e262e385c4d0cc.png",
-                    false,
-                  ),
-                ],
-              ),
+          ),
+          SizedBox(
+            height: 60,
+            child: ListView(
+              controller: _scrollController,
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.symmetric(horizontal: 10),
+              children: [
+                categoryItem(
+                  "All",
+                  "assats/image/34f428e47c8da57a9f796e1596d68f1688fa073a.png",
+                  true,
+                ),
+                categoryItem(
+                  "Hot Dog",
+                  "assats/image/30fc202b681cf552fb8011ec1be440edbee3f301.png",
+                  false,
+                ),
+                categoryItem(
+                  "Burger",
+                  "assats/image/cbd8173438dd01c6f5e642f129e262e385c4d0cc.png",
+                  false,
+                ),
+              ],
             ),
-            const SizedBox(height: 10),
-            const Padding(
-              padding: EdgeInsets.only(left: 10.0),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Recommended for you',
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w400,
-                  ),
+          ),
+          const SizedBox(height: 10),
+          const Padding(
+            padding: EdgeInsets.only(left: 10.0),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Recommended for you',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w400,
                 ),
               ),
             ),
-            StreamBuilder<QuerySnapshot>(
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            child: StreamBuilder<QuerySnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('add_restaurant')
                   .snapshots(),
+
               builder: (context, snapshot) {
+
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
+
                 final docs = snapshot.data!.docs;
+                final query = searchController.text.toLowerCase();
+
                 final filteredDocs = docs.where((doc) {
                   final data = doc.data() as Map<String, dynamic>;
-                  final name = (data['name'] ?? '').toLowerCase();
-                  final description = (data['description'] ?? '').toLowerCase();
-                  final query = searchController.text.toLowerCase();
+
+                  final name = (data['name'] ?? '').toString().toLowerCase();
+                  final description = (data['description'] ?? '').toString().toLowerCase();
+
                   return name.contains(query) || description.contains(query);
                 }).toList();
-                if (filteredDocs.isEmpty) {
-                  return const Center(child: Text("No Data Found"));
-                }
                 return ListView.builder(
                   itemCount: filteredDocs.length,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
+
                   itemBuilder: (context, index) {
+                    // final doc = docs[index];
                     final doc = filteredDocs[index];
                     final data = doc.data() as Map<String, dynamic>;
                     final name = data['name'] ?? '';
@@ -447,6 +443,7 @@ class _HomeV1State extends State<HomeV1> {
                     final opening = data['opening'] ?? '';
                     final closing = data['closing'] ?? '';
                     final imagePath = data['image_path'] ?? '';
+
                     final item = FavourateItem(
                       resturantname: name,
                       description: description,
@@ -454,155 +451,94 @@ class _HomeV1State extends State<HomeV1> {
                       closing: closing,
                       imagePath: imagePath,
                     );
-                    return SizedBox(
-                      height: 195,
-                      width: 354,
+                    return Card(
+                      margin: const EdgeInsets.all(10),
+                      color: Colors.white,
+
                       child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Card(
-                          color: Colors.white,
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    width: 90,
-                                    height: 70,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      image: DecorationImage(
-                                        image: (imagePath != '')
-                                            ? FileImage(File(imagePath))
-                                            : const AssetImage(
-                                            'assats/image/default.png')
-                                        as ImageProvider,
-                                        fit: BoxFit.cover,
-                                      ),
+                        padding: const EdgeInsets.all(10),
+                        child: Column(
+                          children: [
+
+                            Row(
+                              children: [
+
+                                Container(
+                                  width: 90,
+                                  height: 70,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(12),
+                                    image: DecorationImage(
+                                      image: (imagePath != '')
+                                          ? FileImage(File(imagePath))
+                                          : const AssetImage('assats/image/default.png')
+                                              as ImageProvider,
+                                      fit: BoxFit.cover,
                                     ),
                                   ),
-                                  const SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      children: [
-                                        Text(name,style: TextStyle(color: Color(0xFF181C2E),fontWeight: FontWeight.w400,fontSize: 22),),
-                                        Text(description,style: TextStyle(color: Color(0XFFA0A5BA),fontWeight: FontWeight.w400,fontSize: 18),),
-                                      ],
-                                    ),
+                                ),
+
+                                const SizedBox(width: 10),
+
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(name),
+                                      Text(description),
+                                    ],
                                   ),
-                                  // IconButton(onPressed: (){
-                                  //
-                                  //   FirebaseFirestore.instance.collection('add_restaurant').doc(doc.id).delete();
-                                  // }, icon:Icon(Icons.delete,color: Colors.red,)),
-                                  IconButton(
-                                    onPressed: () {
-                                      showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return AlertDialog(
-                                            title: const Text("Delete"),
-                                            content: const Text("Are you sure you want to delete?"),
-                                            actions: [
+                                ),
 
-                                              // ❌ CANCEL
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context); // dialog close
-                                                },
-                                                child: const Text("Cancel"),
-                                              ),
+                                IconButton(
+                                  icon: const Icon(Icons.delete, color: Colors.red),
+                                  onPressed: () {
+                                    FirebaseFirestore.instance
+                                        .collection('add_restaurant')
+                                        .doc(doc.id)
+                                        .delete();
+                                  },
+                                ),
 
-                                              // ✅ OK DELETE
-                                              TextButton(
-                                                onPressed: () {
-                                                  FirebaseFirestore.instance
-                                                      .collection('add_restaurant')
-                                                      .doc(doc.id)
-                                                      .delete();
+                                IconButton(
+                                  icon: const Icon(Icons.edit),
+                                  onPressed: () {
+                                    Get.to(() => Update1(
+                                      docId: doc.id,
+                                      data: data,
+                                    ));
+                                  },
+                                ),
+                              ],
+                            ),
 
-                                                  Navigator.pop(context); // dialog close
-
-                                                  Get.snackbar("Deleted", "Restaurant deleted successfully");
-                                                },
-                                                child: const Text(
-                                                  "OK",
-                                                  style: TextStyle(color: Colors.red),
-                                                ),
-                                              ),
-
-                                            ],
-                                          );
-                                        },
-                                      );
-                                    },
-                                    icon: const Icon(Icons.delete, color: Colors.red),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                Text("Open: $opening"),
+                                const SizedBox(width: 10),
+                                Text("Close: $closing"),
+                                const Spacer(),
+                                IconButton(
+                                  icon: Icon(
+                                    isFavorite(name)
+                                        ? Icons.favorite
+                                        : Icons.favorite_border,
+                                    color: const Color(0xFFEB4646),
                                   ),
-                                  IconButton(
-                                    onPressed: () {
-                                      Get.to(() => Update1(
-                                        docId: doc.id,
-                                        data: data,
-                                      ));
-                                    },
-                                    icon: Icon(Icons.edit),
-                                  ),
-                                ],
-                              ),
-
-                              Row(
-                                children: [
-                                  Text("Open:",style: TextStyle(color: Colors.black,fontSize: 14,fontWeight: FontWeight.w700),),
-                                  Text("$opening",style: TextStyle(color: Colors.green,fontSize: 14,fontWeight: FontWeight.w700),),
-                                  const SizedBox(width: 10),
-                                  Text("Close:",style: TextStyle(color: Colors.black,fontSize: 14,fontWeight: FontWeight.w700),),
-                                  Text("$closing",style: TextStyle(color: Colors.red,fontSize: 14,fontWeight: FontWeight.w700),),
-                                  const Spacer(),
-                                  IconButton(
-                                    icon: Icon(
-                                      isFavorite(name)
-                                          ? Icons.favorite
-                                          : Icons.favorite_border,
-                                      color: const Color(0xFFEB4646),
-                                    ),
-                                    onPressed: () => toggleFavorite(item),
-                                  ),
-
-                            ],
-                          ),
-                              Row(
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 15.0, top: 0),
-                                    child: SizedBox(
-                                      width: 116,
-                                      height: 35,
-                                      child: TextButton(
-                                        style: TextButton.styleFrom(
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(10),
-                                            side: const BorderSide(color: Color(0xFFEB4646)),
-                                          ),
-                                        ),
-                                        onPressed: () {
-                                          Get.to(() => const ResturantMenu(), arguments: {
-                                            'name': name,
-                                            'description': description,
-                                            'opening': opening,
-                                            'closing': closing,
-                                            'image': imagePath,
-                                          });
-                                        },
-                                        child: const Text('Moderate',
-                                            style: TextStyle(color: Color(0xFFEB4646), fontWeight: FontWeight.w700)),
-                                      ),
-                                    ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 10.0, top: 2),
-                                    child: TextButton.icon(
+                                  onPressed: () => toggleFavorite(item),
+                                ),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 15.0, top: 0),
+                                  child: SizedBox(
+                                    width: 116,
+                                    height: 35,
+                                    child: TextButton(
                                       style: TextButton.styleFrom(
-                                        backgroundColor: const Color(0xFFEB4646),
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(10),
                                           side: const BorderSide(color: Color(0xFFEB4646)),
@@ -617,31 +553,55 @@ class _HomeV1State extends State<HomeV1> {
                                           'image': imagePath,
                                         });
                                       },
-                                      icon: const Icon(Icons.menu_book, color: Colors.white),
-                                      label: const Text('view menu', style: TextStyle(color: Colors.white)),
+                                      child: const Text('Moderate',
+                                          style: TextStyle(color: Color(0xFFEB4646), fontWeight: FontWeight.w700)),
                                     ),
                                   ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 10.0),
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        Get.to(() => Location1(), arguments: {
-                                          "docId": doc.id,
-                                          "name": name,
-                                          "description": description,
-                                          "opening": opening,
-                                          "closing": closing,
-                                          "image": imagePath,
-                                          "lat": data["lat"],
-                                          "lng": data["lng"],
-                                        });
-                                      },
-                                      child: Image.asset('assats/image/Vector.png'),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 10.0, top: 2),
+                                  child: TextButton.icon(
+                                    style: TextButton.styleFrom(
+                                      backgroundColor: const Color(0xFFEB4646),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        side: const BorderSide(color: Color(0xFFEB4646)),
+                                      ),
                                     ),
+                                    onPressed: () {
+                                      Get.to(() => const ResturantMenu(), arguments: {
+                                        'name': name,
+                                        'description': description,
+                                        'opening': opening,
+                                        'closing': closing,
+                                        'image': imagePath,
+                                      });
+                                    },
+                                    icon: const Icon(Icons.menu_book, color: Colors.white),
+                                    label: const Text('view menu', style: TextStyle(color: Colors.white)),
                                   ),
-                                ],
-                              ),
-                            ]),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 10.0),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Get.to(() => Location1(), arguments: {
+                                        "docId": doc.id,
+                                        "name": name,
+                                        "description": description,
+                                        "opening": opening,
+                                        "closing": closing,
+                                        "image": imagePath,
+                                        "lat": data["lat"],
+                                                  "lng": data["lng"],
+                                      });
+                                    },
+                                    child: Image.asset('assats/image/Vector.png'),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ),
                       ),
                     );
@@ -649,15 +609,14 @@ class _HomeV1State extends State<HomeV1> {
                 );
               },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 }
-
-
 // ================= FAVORITE SCREEN =================
+
 class FavoriteScreen extends StatefulWidget {
   final List<FavourateItem> items;
   final VoidCallback? onUpdate;
@@ -769,7 +728,6 @@ class _FavoriteScreenState extends State<FavoriteScreen> {
           return Card(
             color: Colors.white,
             margin: const EdgeInsets.all(10),
-            // 🔴 SAME UI STRUCTURE (NO CHANGE)
             child: Column(
               children: [
                 Row(

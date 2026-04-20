@@ -23,7 +23,7 @@ class _FavorateState extends State<Favorate> {
       widget.items.removeWhere(
               (e) => e.resturantname == item.resturantname);
     });
-    widget.onUpdate(); // sync with home
+    widget.onUpdate();
   }
 
   @override
@@ -86,7 +86,6 @@ class _FavorateState extends State<Favorate> {
           ),
         ),
       ),
-      // ===== SAME HEADER =====
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -185,7 +184,6 @@ class _FavorateState extends State<Favorate> {
                 );
               },
             ),
-
             const SizedBox(height: 20),
           ],
         ),

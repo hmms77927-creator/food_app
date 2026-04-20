@@ -217,8 +217,6 @@ class First1State extends State<First1> {
               ),
             ],
           ),
-
-          // ===== Skip + Dots + Next Button =====
           Positioned(
             bottom: 40,
             left: 20,

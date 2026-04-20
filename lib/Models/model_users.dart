@@ -13,7 +13,7 @@ class UserModel {
     required this.closing,
   });
 
-  // 🔥 fromMap (Firebase → App)
+
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
       resturantname: map['resturantname'] ?? '',
@@ -23,7 +23,6 @@ class UserModel {
     );
   }
 
-  // 🔥 toMap (App → Firebase)
   Map<String, dynamic> toMap() {
     return {
       'resturantname': resturantname,
