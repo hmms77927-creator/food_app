@@ -1,9 +1,10 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_application_appnexts/location_1.dart' hide Icon;
-import 'package:flutter_application_appnexts/rating_1.dart';
 import 'package:get/get.dart';
+import 'food_menu.dart';
+import 'ratingScreen.dart';
+import 'restuarantListscreen.dart';
 
 class ResturantMenu extends StatefulWidget {
   const ResturantMenu({super.key});
@@ -11,8 +12,10 @@ class ResturantMenu extends StatefulWidget {
   @override
   State<ResturantMenu> createState() => _ResturantMenuState();
 }
+
 class _ResturantMenuState extends State<ResturantMenu> {
   late final Map data;
+
   @override
   void initState() {
     super.initState();
@@ -21,6 +24,8 @@ class _ResturantMenuState extends State<ResturantMenu> {
 
   @override
   Widget build(BuildContext context) {
+    final name = data['name'] ?? '';
+
     return Scaffold(
       backgroundColor: Colors.white,
 
@@ -41,9 +46,7 @@ class _ResturantMenuState extends State<ResturantMenu> {
             backgroundColor: Colors.white,
             shape: const CircleBorder(),
           ),
-          onPressed: () {
-            Get.back();
-          },
+          onPressed: () => Get.back(),
           icon: const Icon(Icons.arrow_back_ios_new),
         ),
 
@@ -54,10 +57,13 @@ class _ResturantMenuState extends State<ResturantMenu> {
           )
         ],
       ),
+
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+
+            // 🖼 IMAGE (SAME UI)
             SizedBox(
               height: 300,
               child: Stack(
@@ -65,7 +71,7 @@ class _ResturantMenuState extends State<ResturantMenu> {
                   SizedBox(
                     width: double.infinity,
                     height: 250,
-                    child: data['image'] != null
+                    child: (data['image'] ?? '').isNotEmpty
                         ? Image.file(
                       File(data['image']),
                       fit: BoxFit.cover,
@@ -92,10 +98,11 @@ class _ResturantMenuState extends State<ResturantMenu> {
 
             const SizedBox(height: 10),
 
+            /// NAME
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
-                data['name'] ?? '',
+                name,
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
@@ -105,6 +112,8 @@ class _ResturantMenuState extends State<ResturantMenu> {
             ),
 
             const SizedBox(height: 5),
+
+            /// DESCRIPTION
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
@@ -112,17 +121,24 @@ class _ResturantMenuState extends State<ResturantMenu> {
                 style: const TextStyle(fontSize: 16),
               ),
             ),
+
             const SizedBox(height: 10),
+
+            /// ⭐ RATING (NAME BASED FIX)
             Row(
               children: [
-                IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.star, color: Color(0xFFEB4646)),
-                ),
+
+                const Icon(Icons.star, color: Color(0xFFEB4646)),
 
                 StreamBuilder<QuerySnapshot>(
-                  stream: FirebaseFirestore.instance.collection('reviews').snapshots(),
+                  stream: FirebaseFirestore.instance
+                      .collection('reviews')
+                      .doc(name)
+                      .collection('items')
+                      .snapshots(),
+
                   builder: (context, snapshot) {
+
                     if (!snapshot.hasData) {
                       return const Text('0.0 (0)');
                     }
@@ -136,8 +152,8 @@ class _ResturantMenuState extends State<ResturantMenu> {
                       double sum = 0;
 
                       for (var doc in docs) {
-                        final data = doc.data() as Map<String, dynamic>;
-                        sum += (data['rating'] ?? 0);
+                        final d = doc.data() as Map<String, dynamic>;
+                        sum += (d['rating'] ?? 0);
                       }
 
                       avgRating = sum / totalRatings;
@@ -155,13 +171,22 @@ class _ResturantMenuState extends State<ResturantMenu> {
                     );
                   },
                 ),
+
                 const Spacer(),
+
+                /// SEE REVIEWS (FIXED)
                 GestureDetector(
                   onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const Rating1()),
-                    );
+                    if (name.isEmpty) {
+                      Get.snackbar("Error", "Restaurant name missing");
+                      return;
+                    }
+
+                    Get.to(() => RatingScreen(
+                      restaurantName: name,
+                      // imagePath: data['image'] ?? '',
+
+                    ));
                   },
                   child: const Text(
                     'See Reviews',
@@ -171,9 +196,11 @@ class _ResturantMenuState extends State<ResturantMenu> {
                     ),
                   ),
                 ),
+
                 const SizedBox(width: 10),
               ],
             ),
+
             const SizedBox(height: 10),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -201,6 +228,8 @@ class _ResturantMenuState extends State<ResturantMenu> {
             ),
 
             const SizedBox(height: 20),
+
+            /// DESCRIPTION TITLE
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: Text(
@@ -211,7 +240,9 @@ class _ResturantMenuState extends State<ResturantMenu> {
                 ),
               ),
             ),
+
             const SizedBox(height: 10),
+
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Text(
@@ -221,6 +252,8 @@ class _ResturantMenuState extends State<ResturantMenu> {
             ),
 
             const SizedBox(height: 20),
+
+            /// BUTTONS
             Padding(
               padding: const EdgeInsets.all(10),
               child: Row(
@@ -247,10 +280,7 @@ class _ResturantMenuState extends State<ResturantMenu> {
 
                   GestureDetector(
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const Location1()),
-                      );
+                      Get.to(() => const FoodMenu());
                     },
                     child: Image.asset('assats/image/Vector.png'),
                   ),
@@ -263,4 +293,3 @@ class _ResturantMenuState extends State<ResturantMenu> {
     );
   }
 }
-

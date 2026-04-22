@@ -82,8 +82,6 @@ class _ImgeState extends State<Imge> {
       });
     }
   }
-
-  /// 💾 SAVE / UPDATE DATA (MAIN FIX)
   Future saveData() async {
     await FirebaseFirestore.instance
         .collection('add_restaurant')
@@ -98,7 +96,9 @@ class _ImgeState extends State<Imge> {
       "uid": uid,
       "lat": lat,
       "lng": lng,
-      "updatedAt": FieldValue.serverTimestamp(),
+      "rating": 0,
+      "totalReviews": 0,
+      "createdAt": FieldValue.serverTimestamp(),
     }, SetOptions(merge: true));
 
     final prefs = await SharedPreferences.getInstance();
@@ -177,8 +177,6 @@ class _ImgeState extends State<Imge> {
               ),
 
               const SizedBox(height: 10),
-
-              /// 📍 LOCATION
               TextField(
                 controller: locationController,
                 readOnly: true,
@@ -202,7 +200,6 @@ class _ImgeState extends State<Imge> {
 
               const SizedBox(height: 20),
 
-              /// 💾 SAVE BUTTON
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFEB4646),

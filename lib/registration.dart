@@ -29,8 +29,6 @@ class _RegistrationState extends State<Registration> {
   TextEditingController passwordController = TextEditingController();
   bool isSave = false;
   bool isLoading = false;
-
-  /// SIGNUP FUNCTION
   Future<void> signup() async {
     setState(() => isLoading = true);
     try {
@@ -72,7 +70,6 @@ class _RegistrationState extends State<Registration> {
     setState(() => isLoading = false);
   }
 
-  /// LOGIN FUNCTION
   Future<void> login() async {
     setState(() => isLoading = true);
     try {
@@ -106,8 +103,6 @@ class _RegistrationState extends State<Registration> {
     }
     setState(() => isLoading = false);
   }
-
-  /// INPUT DECORATION
   InputDecoration _inputDecoration({Widget? suffix}) {
     return InputDecoration(
       border: OutlineInputBorder(
@@ -173,7 +168,6 @@ class _RegistrationState extends State<Registration> {
                     Expanded(
                       child: TabBarView(
                         children: [
-                          /// SIGNUP TAB
                           SingleChildScrollView(
                             child: Padding(
                               padding: const EdgeInsets.all(15.0),
@@ -203,7 +197,6 @@ class _RegistrationState extends State<Registration> {
                             ),
                           ),
 
-                          /// LOGIN TAB
                           SingleChildScrollView(
                             child: Padding(
                               padding: const EdgeInsets.all(15.0),

@@ -1,5 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart'; // Add this import
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_application_appnexts/notes.dart';
 import 'package:flutter_application_appnexts/rating_1.dart';
@@ -32,7 +32,7 @@ class _DraHomeState extends State<DraHome> {
         duration: const Duration(seconds: 2),
       );
     } catch (e) {
-      print('Logout error: $e'); // Add logging for debugging
+      print('Logout error: $e');
       Get.snackbar(
         'Logout Failed',
         'Error: ${e.toString()}',
@@ -52,7 +52,6 @@ class _DraHomeState extends State<DraHome> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Drawer Header
               SizedBox(
                 height: 190,
                 child: Stack(
@@ -155,10 +154,7 @@ class _DraHomeState extends State<DraHome> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 15),
-
-              // Other Options Card
               SizedBox(
                 width: 217,
                 child: Card(
@@ -218,8 +214,6 @@ class _DraHomeState extends State<DraHome> {
                           Navigator.push(context,MaterialPageRoute(builder: (context)=> Rating1()));
                           },
                       ),
-
-
                       ListTile(
                         leading: Image.asset(
                           'assats/image/Frame (3).png',
@@ -259,10 +253,8 @@ class _DraHomeState extends State<DraHome> {
                   ),
                 ),
               ),
-
-              const SizedBox(height: 120),
               Padding(
-                padding: const EdgeInsets.only(right: 30,bottom: 40),
+                padding: const EdgeInsets.only(right: 30,top: 60),
                 child: Align(
                   alignment: Alignment.bottomRight,
                   child: GestureDetector(
@@ -298,4 +290,3 @@ class _DraHomeState extends State<DraHome> {
     );
   }
 }
-

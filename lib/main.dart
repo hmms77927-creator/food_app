@@ -18,7 +18,6 @@ import 'package:flutter_application_appnexts/registration_1.dart';
 import 'package:flutter_application_appnexts/resturant_menu.dart';
 import 'package:flutter_application_appnexts/setting.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
-
 import 'Services/wrapper.dart';
 import 'firebase_options.dart';
 

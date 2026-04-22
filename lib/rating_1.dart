@@ -248,7 +248,6 @@ class _Rating1State extends State<Rating1> {
                               children: [
                                 const SizedBox(height: 4),
 
-                                // ⭐ stars
                                 Row(
                                   children: List.generate(
                                     5,
@@ -317,7 +316,6 @@ class _Rating1State extends State<Rating1> {
 
                   const SizedBox(height: 12),
 
-                  // ================= BUTTON =================
                   SizedBox(
                     width: double.infinity,
                     height: 50,
